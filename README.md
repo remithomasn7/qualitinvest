@@ -41,3 +41,7 @@ To enable debug mode, use the `--debugger` option:
 ```bash
 flask --app app run --debugger 
 ```
+
+# RESSOURCES
+
+https://www.freecodecamp.org/news/how-to-build-historical-price-charts-with-d3-js-72214aaf6ba3/
