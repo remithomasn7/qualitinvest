@@ -45,7 +45,7 @@ func CompanyOverview(c *gin.Context, apiClient *alpha_vantage.AlphaVantageClient
 // @Param symbol path string true "Company Symbol"
 // @Success 200 {object} pkg.OverviewResponse
 // @Failure 500 {object} pkg.OverviewResponse
-// @Router /companies/{symbol}/incomestatements [get]
+// @Router /companies/{symbol}/income [get]
 func IncomeStatements(c *gin.Context, apiClient *alpha_vantage.AlphaVantageClient) {
 	symbol := c.Param("symbol")
 
@@ -89,6 +89,33 @@ func BalanceSheet(c *gin.Context, apiClient *alpha_vantage.AlphaVantageClient) {
 	c.JSON(http.StatusOK, pkg.BalanceSheetResponse{
 		Status: "success",
 		Data:   balanceSheetData,
+	})
+}
+
+// CashFlowStatements - Return the company's Cash Flow statements
+// @Summary Get the company's cash flow statements
+// @Description Get the company's cash flow statements.
+// @Tags Financials
+// @Param symbol path string true "Company Symbol"
+// @Success 200 {object} pkg.CashFlowStatementsResponse
+// @Failure 500 {object} pkg.CashFlowStatementsResponse
+// @Router /companies/{symbol}/cashflow [get]
+func CashFlowStatements(c *gin.Context, apiClient *alpha_vantage.AlphaVantageClient) {
+	symbol := c.Param("symbol")
+
+	cashFlowStatementsData, err := services.FetchCashFlowStatements(apiClient, symbol)
+	if err != nil {
+		log.Printf("Error while retrieve the cash flow statements for %s: %v", symbol, err)
+		c.JSON(http.StatusInternalServerError, pkg.ErrorResponse{
+			Status:  "error",
+			Message: err.Error(),
+			Code:    http.StatusInternalServerError,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, pkg.CashFlowStatementsResponse{
+		Status: "success",
+		Data:   cashFlowStatementsData,
 	})
 }
 

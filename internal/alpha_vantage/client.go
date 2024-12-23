@@ -118,6 +118,27 @@ func (c *AlphaVantageClient) BalanceSheet(symbol string) (*models.BalanceSheet, 
 	return toBalanceSheet(body)
 }
 
+func toCashFlowStatements(buf []byte) (*models.CashFlowStatements, error) {
+	cashFlowStatements := &models.CashFlowStatements{}
+	if err := json.Unmarshal(buf, cashFlowStatements); err != nil {
+		return nil, err
+	}
+	return cashFlowStatements, nil
+}
+func (c *AlphaVantageClient) CashFlowStatements(symbol string) (*models.CashFlowStatements, error) {
+	params := map[string]string{
+		"function": "CASH_FLOW",
+		"symbol":   symbol,
+	}
+
+	body, err := c.fetch(params)
+	if err != nil {
+		return nil, err
+	}
+
+	return toCashFlowStatements(body)
+}
+
 func (c *AlphaVantageClient) GetROCE(symbol string) ([]models.ROCE, error) {
 	// params := map[string]string{
 	// 	"function": "ROCE",

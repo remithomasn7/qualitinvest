@@ -15,13 +15,12 @@ var financialCache = cache.New(24*time.Hour, 1*time.Hour)
 func FetchCompanyOverview(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.CompanyOverview, error) {
 	// Check if data are in cache
 	if cachedData, found := financialCache.Get("overview_" + symbol); found {
-		log.Printf("Found overview data in cache : %v", cachedData)
+		log.Printf("Overview data successfuly found in cache for: %s", symbol)
 		return cachedData.(models.CompanyOverview), nil
 	}
 
 	// If data are not in cache, call AlphaVantage API
 	overviewData, err := apiClient.CompanyOverview(symbol)
-	log.Printf("FetchCompanyOverview successfully called %v", overviewData)
 	if err != nil {
 		return models.CompanyOverview{}, err
 	}
@@ -34,34 +33,32 @@ func FetchCompanyOverview(apiClient *alpha_vantage.AlphaVantageClient, symbol st
 
 func FetchIncomeStatements(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.IncomeStatements, error) {
 	// Check if data are in cache
-	if cachedData, found := financialCache.Get("incomestatements_" + symbol); found {
-		log.Printf("Found income statements data in cache : %v", cachedData)
+	if cachedData, found := financialCache.Get("income_" + symbol); found {
+		log.Printf("Income Statements data successfuly found in cache for: %s", symbol)
 		return cachedData.(models.IncomeStatements), nil
 	}
 
 	// If data are not in cache, call AlphaVantage API
-	incomestatementsData, err := apiClient.IncomeStatements(symbol)
-	log.Printf("FetchIncomeStatements successfully called %v", incomestatementsData)
+	incomeData, err := apiClient.IncomeStatements(symbol)
 	if err != nil {
 		return models.IncomeStatements{}, err
 	}
 
 	// Store/Update data in cache
-	financialCache.Set("incomestatements_"+symbol, *incomestatementsData, cache.DefaultExpiration)
+	financialCache.Set("income_"+symbol, *incomeData, cache.DefaultExpiration)
 
-	return *incomestatementsData, nil
+	return *incomeData, nil
 }
 
 func FetchBalanceSheet(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.BalanceSheet, error) {
 	// Check if data are in cache
 	if cachedData, found := financialCache.Get("balancesheet_" + symbol); found {
-		log.Printf("Found balance sheet data in cache : %v", cachedData)
+		log.Printf("Balance Sheet data successfuly found in cache for: %s", symbol)
 		return cachedData.(models.BalanceSheet), nil
 	}
 
 	// If data are not in cache, call AlphaVantage API
 	balanceSheetData, err := apiClient.BalanceSheet(symbol)
-	log.Printf("FetchBalanceSheet successfully called %v", balanceSheetData)
 	if err != nil {
 		return models.BalanceSheet{}, err
 	}
@@ -70,6 +67,25 @@ func FetchBalanceSheet(apiClient *alpha_vantage.AlphaVantageClient, symbol strin
 	financialCache.Set("balancesheet_"+symbol, *balanceSheetData, cache.DefaultExpiration)
 
 	return *balanceSheetData, nil
+}
+
+func FetchCashFlowStatements(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.CashFlowStatements, error) {
+	// Check if data are in cache
+	if cachedData, found := financialCache.Get("cashflow_" + symbol); found {
+		log.Printf("Cash Flow Statements successfuly found in cache for: %s", symbol)
+		return cachedData.(models.CashFlowStatements), nil
+	}
+
+	// If data are not in cache, call AlphaVantage API
+	cashFlowData, err := apiClient.CashFlowStatements(symbol)
+	if err != nil {
+		return models.CashFlowStatements{}, err
+	}
+
+	// Store/Update data in cache
+	financialCache.Set("cashflow_"+symbol, *cashFlowData, cache.DefaultExpiration)
+
+	return *cashFlowData, nil
 }
 
 func FetchROCE(apiClient *alpha_vantage.AlphaVantageClient, symbol string) ([]models.ROCE, error) {

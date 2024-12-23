@@ -171,6 +171,141 @@ definitions:
       treasuryStock:
         type: integer
     type: object
+  models.CashFlowStatements:
+    properties:
+      annualReports:
+        items:
+          $ref: '#/definitions/models.CashFlowStatementsAnnualReport'
+        type: array
+      quarterlyReports:
+        items:
+          $ref: '#/definitions/models.CashFlowStatementsQuarterlyReport'
+        type: array
+      symbol:
+        type: string
+    type: object
+  models.CashFlowStatementsAnnualReport:
+    properties:
+      capitalExpenditures:
+        type: integer
+      cashflowFromFinancing:
+        type: integer
+      cashflowFromInvestment:
+        type: integer
+      changeInCashAndCashEquivalents:
+        type: integer
+      changeInExchangeRate:
+        type: integer
+      changeInInventory:
+        type: integer
+      changeInOperatingAssets:
+        type: integer
+      changeInOperatingLiabilities:
+        type: integer
+      changeInReceivables:
+        type: integer
+      depreciationDepletionAndAmortization:
+        type: integer
+      dividendPayout:
+        type: integer
+      dividendPayoutCommonStock:
+        type: integer
+      dividendPayoutPreferredStock:
+        type: integer
+      fiscalDateEnding:
+        type: string
+      netIncome:
+        type: integer
+      operatingCashflow:
+        type: integer
+      paymentsForOperatingActivities:
+        type: integer
+      paymentsForRepurchaseOfCommonStock:
+        type: integer
+      paymentsForRepurchaseOfEquity:
+        type: integer
+      paymentsForRepurchaseOfPreferredStock:
+        type: integer
+      proceedsFromIssuanceOfCommonStock:
+        type: integer
+      proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet:
+        type: integer
+      proceedsFromIssuanceOfPreferredStock:
+        type: integer
+      proceedsFromOperatingActivities:
+        type: integer
+      proceedsFromRepaymentsOfShortTermDebt:
+        type: integer
+      proceedsFromRepurchaseOfEquity:
+        type: integer
+      proceedsFromSaleOfTreasuryStock:
+        type: integer
+      profitLoss:
+        type: integer
+      reportedCurrency:
+        type: string
+    type: object
+  models.CashFlowStatementsQuarterlyReport:
+    properties:
+      capitalExpenditures:
+        type: integer
+      cashflowFromFinancing:
+        type: integer
+      cashflowFromInvestment:
+        type: integer
+      changeInCashAndCashEquivalents:
+        type: integer
+      changeInExchangeRate:
+        type: integer
+      changeInInventory:
+        type: integer
+      changeInOperatingAssets:
+        type: integer
+      changeInOperatingLiabilities:
+        type: integer
+      changeInReceivables:
+        type: integer
+      depreciationDepletionAndAmortization:
+        type: integer
+      dividendPayout:
+        type: integer
+      dividendPayoutCommonStock:
+        type: integer
+      dividendPayoutPreferredStock:
+        type: integer
+      fiscalDateEnding:
+        type: string
+      netIncome:
+        type: integer
+      operatingCashflow:
+        type: integer
+      paymentsForOperatingActivities:
+        type: integer
+      paymentsForRepurchaseOfCommonStock:
+        type: integer
+      paymentsForRepurchaseOfEquity:
+        type: integer
+      paymentsForRepurchaseOfPreferredStock:
+        type: integer
+      proceedsFromIssuanceOfCommonStock:
+        type: integer
+      proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet:
+        type: integer
+      proceedsFromIssuanceOfPreferredStock:
+        type: integer
+      proceedsFromOperatingActivities:
+        type: integer
+      proceedsFromRepaymentsOfShortTermDebt:
+        type: integer
+      proceedsFromRepurchaseOfEquity:
+        type: integer
+      proceedsFromSaleOfTreasuryStock:
+        type: integer
+      profitLoss:
+        type: integer
+      reportedCurrency:
+        type: string
+    type: object
   models.CompanyOverview:
     properties:
       50DayMovingAverage:
@@ -382,6 +517,16 @@ definitions:
         description: The answer's status
         type: string
     type: object
+  pkg.CashFlowStatementsResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/models.CashFlowStatements'
+        description: Cash Flow Statements data
+      status:
+        description: The answer's status
+        type: string
+    type: object
   pkg.DebtEBITDAResponse:
     properties:
       data:
@@ -508,7 +653,28 @@ paths:
       summary: Get the company's balance sheet
       tags:
       - Financials
-  /companies/{symbol}/incomestatements:
+  /companies/{symbol}/cashflow:
+    get:
+      description: Get the company's cash flow statements.
+      parameters:
+      - description: Company Symbol
+        in: path
+        name: symbol
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.CashFlowStatementsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.CashFlowStatementsResponse'
+      summary: Get the company's cash flow statements
+      tags:
+      - Financials
+  /companies/{symbol}/income:
     get:
       description: Get the company's income statements.
       parameters:

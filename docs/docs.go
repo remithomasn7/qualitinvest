@@ -47,7 +47,39 @@ const docTemplate = `{
                 }
             }
         },
-        "/companies/{symbol}/incomestatements": {
+        "/companies/{symbol}/cashflow": {
+            "get": {
+                "description": "Get the company's cash flow statements.",
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get the company's cash flow statements",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.CashFlowStatementsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.CashFlowStatementsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{symbol}/income": {
             "get": {
                 "description": "Get the company's income statements.",
                 "tags": [
@@ -613,6 +645,210 @@ const docTemplate = `{
                 }
             }
         },
+        "models.CashFlowStatements": {
+            "type": "object",
+            "properties": {
+                "annualReports": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CashFlowStatementsAnnualReport"
+                    }
+                },
+                "quarterlyReports": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.CashFlowStatementsQuarterlyReport"
+                    }
+                },
+                "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CashFlowStatementsAnnualReport": {
+            "type": "object",
+            "properties": {
+                "capitalExpenditures": {
+                    "type": "integer"
+                },
+                "cashflowFromFinancing": {
+                    "type": "integer"
+                },
+                "cashflowFromInvestment": {
+                    "type": "integer"
+                },
+                "changeInCashAndCashEquivalents": {
+                    "type": "integer"
+                },
+                "changeInExchangeRate": {
+                    "type": "integer"
+                },
+                "changeInInventory": {
+                    "type": "integer"
+                },
+                "changeInOperatingAssets": {
+                    "type": "integer"
+                },
+                "changeInOperatingLiabilities": {
+                    "type": "integer"
+                },
+                "changeInReceivables": {
+                    "type": "integer"
+                },
+                "depreciationDepletionAndAmortization": {
+                    "type": "integer"
+                },
+                "dividendPayout": {
+                    "type": "integer"
+                },
+                "dividendPayoutCommonStock": {
+                    "type": "integer"
+                },
+                "dividendPayoutPreferredStock": {
+                    "type": "integer"
+                },
+                "fiscalDateEnding": {
+                    "type": "string"
+                },
+                "netIncome": {
+                    "type": "integer"
+                },
+                "operatingCashflow": {
+                    "type": "integer"
+                },
+                "paymentsForOperatingActivities": {
+                    "type": "integer"
+                },
+                "paymentsForRepurchaseOfCommonStock": {
+                    "type": "integer"
+                },
+                "paymentsForRepurchaseOfEquity": {
+                    "type": "integer"
+                },
+                "paymentsForRepurchaseOfPreferredStock": {
+                    "type": "integer"
+                },
+                "proceedsFromIssuanceOfCommonStock": {
+                    "type": "integer"
+                },
+                "proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet": {
+                    "type": "integer"
+                },
+                "proceedsFromIssuanceOfPreferredStock": {
+                    "type": "integer"
+                },
+                "proceedsFromOperatingActivities": {
+                    "type": "integer"
+                },
+                "proceedsFromRepaymentsOfShortTermDebt": {
+                    "type": "integer"
+                },
+                "proceedsFromRepurchaseOfEquity": {
+                    "type": "integer"
+                },
+                "proceedsFromSaleOfTreasuryStock": {
+                    "type": "integer"
+                },
+                "profitLoss": {
+                    "type": "integer"
+                },
+                "reportedCurrency": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.CashFlowStatementsQuarterlyReport": {
+            "type": "object",
+            "properties": {
+                "capitalExpenditures": {
+                    "type": "integer"
+                },
+                "cashflowFromFinancing": {
+                    "type": "integer"
+                },
+                "cashflowFromInvestment": {
+                    "type": "integer"
+                },
+                "changeInCashAndCashEquivalents": {
+                    "type": "integer"
+                },
+                "changeInExchangeRate": {
+                    "type": "integer"
+                },
+                "changeInInventory": {
+                    "type": "integer"
+                },
+                "changeInOperatingAssets": {
+                    "type": "integer"
+                },
+                "changeInOperatingLiabilities": {
+                    "type": "integer"
+                },
+                "changeInReceivables": {
+                    "type": "integer"
+                },
+                "depreciationDepletionAndAmortization": {
+                    "type": "integer"
+                },
+                "dividendPayout": {
+                    "type": "integer"
+                },
+                "dividendPayoutCommonStock": {
+                    "type": "integer"
+                },
+                "dividendPayoutPreferredStock": {
+                    "type": "integer"
+                },
+                "fiscalDateEnding": {
+                    "type": "string"
+                },
+                "netIncome": {
+                    "type": "integer"
+                },
+                "operatingCashflow": {
+                    "type": "integer"
+                },
+                "paymentsForOperatingActivities": {
+                    "type": "integer"
+                },
+                "paymentsForRepurchaseOfCommonStock": {
+                    "type": "integer"
+                },
+                "paymentsForRepurchaseOfEquity": {
+                    "type": "integer"
+                },
+                "paymentsForRepurchaseOfPreferredStock": {
+                    "type": "integer"
+                },
+                "proceedsFromIssuanceOfCommonStock": {
+                    "type": "integer"
+                },
+                "proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet": {
+                    "type": "integer"
+                },
+                "proceedsFromIssuanceOfPreferredStock": {
+                    "type": "integer"
+                },
+                "proceedsFromOperatingActivities": {
+                    "type": "integer"
+                },
+                "proceedsFromRepaymentsOfShortTermDebt": {
+                    "type": "integer"
+                },
+                "proceedsFromRepurchaseOfEquity": {
+                    "type": "integer"
+                },
+                "proceedsFromSaleOfTreasuryStock": {
+                    "type": "integer"
+                },
+                "profitLoss": {
+                    "type": "integer"
+                },
+                "reportedCurrency": {
+                    "type": "string"
+                }
+            }
+        },
         "models.CompanyOverview": {
             "type": "object",
             "properties": {
@@ -903,6 +1139,23 @@ const docTemplate = `{
                     "allOf": [
                         {
                             "$ref": "#/definitions/models.BalanceSheet"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "The answer's status",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.CashFlowStatementsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Cash Flow Statements data",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.CashFlowStatements"
                         }
                     ]
                 },

@@ -18,6 +18,8 @@ import (
 func main() {
 	router := gin.Default()
 
+	router.SetTrustedProxies(nil)
+
 	// Instanciation de l'API client
 	apiClient := alpha_vantage.NewClient()
 
@@ -27,11 +29,14 @@ func main() {
 		v1.GET("/overview", func(c *gin.Context) {
 			controllers.CompanyOverview(c, apiClient)
 		})
-		v1.GET("/incomestatements", func(c *gin.Context) {
+		v1.GET("/income", func(c *gin.Context) {
 			controllers.IncomeStatements(c, apiClient)
 		})
 		v1.GET("/balancesheet", func(c *gin.Context) {
 			controllers.BalanceSheet(c, apiClient)
+		})
+		v1.GET("/cashflow", func(c *gin.Context) {
+			controllers.CashFlowStatements(c, apiClient)
 		})
 		v1.GET("/roce", func(c *gin.Context) {
 			controllers.GetROCE(c, apiClient)
@@ -41,9 +46,6 @@ func main() {
 		})
 		v1.GET("/growth", func(c *gin.Context) {
 			controllers.GetGrowth(c, apiClient)
-		})
-		v1.GET("/cashflow", func(c *gin.Context) {
-			controllers.GetFreeCashFlow(c, apiClient)
 		})
 		v1.GET("/shares", func(c *gin.Context) {
 			controllers.GetShareDilution(c, apiClient)

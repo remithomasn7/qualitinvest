@@ -34,6 +34,12 @@ type BalanceSheetResponse struct {
 	Data   models.BalanceSheet `json:"data"`   // Balance Sheet data
 }
 
+// CashFlowStatementsResponse represents the answer when the company's cash flow statements are requested.
+type CashFlowStatementsResponse struct {
+	Status string                    `json:"status"` // The answer's status
+	Data   models.CashFlowStatements `json:"data"`   // Cash Flow Statements data
+}
+
 // ROCEResponse représente la réponse pour le ratio ROCE.
 type ROCEResponse struct {
 	Status string        `json:"status"` // Statut de la réponse

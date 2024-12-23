@@ -48,9 +48,9 @@ type RDExpenses struct {
 }
 
 type IncomeStatements struct {
-	Symbol           string                         `json:"symbol"`
-	AnnualReports    []AnnualReportIncomeStatements `json:"annualReports"`
-	QuarterlyReports []IncomeStatements             `json:"quarterlyReports"`
+	Symbol           string                            `json:"symbol"`
+	AnnualReports    []AnnualReportIncomeStatements    `json:"annualReports"`
+	QuarterlyReports []QuarterlyReportIncomeStatements `json:"quarterlyReports"`
 }
 type AnnualReportIncomeStatements struct {
 	FiscalDateEnding                  string `json:"fiscalDateEnding"`
@@ -205,7 +205,6 @@ type BalanceSheetAnnualReport struct {
 	CommonStock                            AVInt  `json:"commonStock"`
 	CommonStockSharesOutstanding           AVInt  `json:"commonStockSharesOutstanding"`
 }
-
 type BalanceSheetQuarterlyReport struct {
 	FiscalDateEnding                       string `json:"fiscalDateEnding"`
 	ReportedCurrency                       string `json:"reportedCurrency"`
@@ -245,4 +244,72 @@ type BalanceSheetQuarterlyReport struct {
 	RetainedEarnings                       AVInt  `json:"retainedEarnings"`
 	CommonStock                            AVInt  `json:"commonStock"`
 	CommonStockSharesOutstanding           AVInt  `json:"commonStockSharesOutstanding"`
+}
+
+type CashFlowStatements struct {
+	Symbol           string                              `json:"symbol"`
+	AnnualReports    []CashFlowStatementsAnnualReport    `json:"annualReports"`
+	QuarterlyReports []CashFlowStatementsQuarterlyReport `json:"quarterlyReports"`
+}
+type CashFlowStatementsAnnualReport struct {
+	FiscalDateEnding                                          string `json:"fiscalDateEnding"`
+	ReportedCurrency                                          string `json:"reportedCurrency"`
+	OperatingCashflow                                         AVInt  `json:"operatingCashflow"`
+	PaymentsForOperatingActivities                            AVInt  `json:"paymentsForOperatingActivities"`
+	ProceedsFromOperatingActivities                           AVInt  `json:"proceedsFromOperatingActivities"`
+	ChangeInOperatingLiabilities                              AVInt  `json:"changeInOperatingLiabilities"`
+	ChangeInOperatingAssets                                   AVInt  `json:"changeInOperatingAssets"`
+	DepreciationDepletionAndAmortization                      AVInt  `json:"depreciationDepletionAndAmortization"`
+	CapitalExpenditures                                       AVInt  `json:"capitalExpenditures"`
+	ChangeInReceivables                                       AVInt  `json:"changeInReceivables"`
+	ChangeInInventory                                         AVInt  `json:"changeInInventory"`
+	ProfitLoss                                                AVInt  `json:"profitLoss"`
+	CashflowFromInvestment                                    AVInt  `json:"cashflowFromInvestment"`
+	CashflowFromFinancing                                     AVInt  `json:"cashflowFromFinancing"`
+	ProceedsFromRepaymentsOfShortTermDebt                     AVInt  `json:"proceedsFromRepaymentsOfShortTermDebt"`
+	PaymentsForRepurchaseOfCommonStock                        AVInt  `json:"paymentsForRepurchaseOfCommonStock"`
+	PaymentsForRepurchaseOfEquity                             AVInt  `json:"paymentsForRepurchaseOfEquity"`
+	PaymentsForRepurchaseOfPreferredStock                     AVInt  `json:"paymentsForRepurchaseOfPreferredStock"`
+	DividendPayout                                            AVInt  `json:"dividendPayout"`
+	DividendPayoutCommonStock                                 AVInt  `json:"dividendPayoutCommonStock"`
+	DividendPayoutPreferredStock                              AVInt  `json:"dividendPayoutPreferredStock"`
+	ProceedsFromIssuanceOfCommonStock                         AVInt  `json:"proceedsFromIssuanceOfCommonStock"`
+	ProceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet AVInt  `json:"proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet"`
+	ProceedsFromIssuanceOfPreferredStock                      AVInt  `json:"proceedsFromIssuanceOfPreferredStock"`
+	ProceedsFromRepurchaseOfEquity                            AVInt  `json:"proceedsFromRepurchaseOfEquity"`
+	ProceedsFromSaleOfTreasuryStock                           AVInt  `json:"proceedsFromSaleOfTreasuryStock"`
+	ChangeInCashAndCashEquivalents                            AVInt  `json:"changeInCashAndCashEquivalents"`
+	ChangeInExchangeRate                                      AVInt  `json:"changeInExchangeRate"`
+	NetIncome                                                 AVInt  `json:"netIncome"`
+}
+type CashFlowStatementsQuarterlyReport struct {
+	FiscalDateEnding                                          string `json:"fiscalDateEnding"`
+	ReportedCurrency                                          string `json:"reportedCurrency"`
+	OperatingCashflow                                         AVInt  `json:"operatingCashflow"`
+	PaymentsForOperatingActivities                            AVInt  `json:"paymentsForOperatingActivities"`
+	ProceedsFromOperatingActivities                           AVInt  `json:"proceedsFromOperatingActivities"`
+	ChangeInOperatingLiabilities                              AVInt  `json:"changeInOperatingLiabilities"`
+	ChangeInOperatingAssets                                   AVInt  `json:"changeInOperatingAssets"`
+	DepreciationDepletionAndAmortization                      AVInt  `json:"depreciationDepletionAndAmortization"`
+	CapitalExpenditures                                       AVInt  `json:"capitalExpenditures"`
+	ChangeInReceivables                                       AVInt  `json:"changeInReceivables"`
+	ChangeInInventory                                         AVInt  `json:"changeInInventory"`
+	ProfitLoss                                                AVInt  `json:"profitLoss"`
+	CashflowFromInvestment                                    AVInt  `json:"cashflowFromInvestment"`
+	CashflowFromFinancing                                     AVInt  `json:"cashflowFromFinancing"`
+	ProceedsFromRepaymentsOfShortTermDebt                     AVInt  `json:"proceedsFromRepaymentsOfShortTermDebt"`
+	PaymentsForRepurchaseOfCommonStock                        AVInt  `json:"paymentsForRepurchaseOfCommonStock"`
+	PaymentsForRepurchaseOfEquity                             AVInt  `json:"paymentsForRepurchaseOfEquity"`
+	PaymentsForRepurchaseOfPreferredStock                     AVInt  `json:"paymentsForRepurchaseOfPreferredStock"`
+	DividendPayout                                            AVInt  `json:"dividendPayout"`
+	DividendPayoutCommonStock                                 AVInt  `json:"dividendPayoutCommonStock"`
+	DividendPayoutPreferredStock                              AVInt  `json:"dividendPayoutPreferredStock"`
+	ProceedsFromIssuanceOfCommonStock                         AVInt  `json:"proceedsFromIssuanceOfCommonStock"`
+	ProceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet AVInt  `json:"proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet"`
+	ProceedsFromIssuanceOfPreferredStock                      AVInt  `json:"proceedsFromIssuanceOfPreferredStock"`
+	ProceedsFromRepurchaseOfEquity                            AVInt  `json:"proceedsFromRepurchaseOfEquity"`
+	ProceedsFromSaleOfTreasuryStock                           AVInt  `json:"proceedsFromSaleOfTreasuryStock"`
+	ChangeInCashAndCashEquivalents                            AVInt  `json:"changeInCashAndCashEquivalents"`
+	ChangeInExchangeRate                                      AVInt  `json:"changeInExchangeRate"`
+	NetIncome                                                 AVInt  `json:"netIncome"`
 }
