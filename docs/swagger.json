@@ -1,0 +1,1055 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API for analyzing company financials based on Alpha Vantage data.",
+        "title": "My Investment API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "basePath": "/api/v1",
+    "paths": {
+        "/companies/{symbol}/balancesheet": {
+            "get": {
+                "description": "Get the company's balance sheet.",
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get the company's balance sheet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.BalanceSheetResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.BalanceSheetResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{symbol}/incomestatements": {
+            "get": {
+                "description": "Get the company's income statements.",
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get the company's income statements",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.OverviewResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.OverviewResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{symbol}/overview": {
+            "get": {
+                "description": "Get the overview  for a given company.",
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get an Overview of a company",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.OverviewResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.OverviewResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{symbol}/roce": {
+            "get": {
+                "description": "Get the ROCE ratio for the last 10 years for a given company. ROCE is a measure of how efficiently a company is using its capital to generate profits.",
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get ROCE for a company",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ROCEResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ROCEResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/financials/{symbol}/debt-ebitda": {
+            "get": {
+                "description": "Récupère la dette et l'EBITDA d'une entreprise sur les 10 dernières années pour calculer le ratio dette/EBITDA.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get Debt to EBITDA Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Symbol de l'entreprise",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.DebtEBITDAResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/financials/{symbol}/free-cash-flow": {
+            "get": {
+                "description": "Récupère le Free Cash Flow par action sur les 10 dernières années pour une entreprise donnée.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get Free Cash Flow Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Symbol de l'entreprise",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.FreeCashFlowResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/financials/{symbol}/growth": {
+            "get": {
+                "description": "Récupère le taux de croissance du chiffre d'affaires et un indice de prévisibilité du chiffre d'affaires pour une entreprise sur les 10 dernières années.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get Growth Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Symbol de l'entreprise",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.GrowthResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/financials/{symbol}/margins": {
+            "get": {
+                "description": "Récupère les marges brute, opérationnelle, nette, et le ratio CAPEX/Résultat opérationnel pour une entreprise donnée sur les 10 dernières années.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get Margins Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Symbol de l'entreprise",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.MarginResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/financials/{symbol}/rd-expenses": {
+            "get": {
+                "description": "Récupère les dépenses en recherche et développement pour une entreprise donnée sur les 10 dernières années.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get R\u0026D Expenses Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Symbol de l'entreprise",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.RDExpensesResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/financials/{symbol}/share-dilution": {
+            "get": {
+                "description": "Récupère le nombre d'actions en circulation pour une entreprise donnée sur les 10 dernières années afin d'analyser la dilution des actionnaires.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get Share Dilution Data",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Symbol de l'entreprise",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ShareDilutionResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "models.BalanceSheet": {
+            "type": "object",
+            "properties": {
+                "annualReports": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.BalanceSheetAnnualReport"
+                    }
+                },
+                "quarterlyReports": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.BalanceSheetQuarterlyReport"
+                    }
+                },
+                "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.BalanceSheetAnnualReport": {
+            "type": "object",
+            "properties": {
+                "accumulatedDepreciationAmortizationPPE": {
+                    "type": "integer"
+                },
+                "capitalLeaseObligations": {
+                    "type": "integer"
+                },
+                "cashAndCashEquivalentsAtCarryingValue": {
+                    "type": "integer"
+                },
+                "cashAndShortTermInvestments": {
+                    "type": "integer"
+                },
+                "commonStock": {
+                    "type": "integer"
+                },
+                "commonStockSharesOutstanding": {
+                    "type": "integer"
+                },
+                "currentAccountsPayable": {
+                    "type": "integer"
+                },
+                "currentDebt": {
+                    "type": "integer"
+                },
+                "currentLongTermDebt": {
+                    "type": "integer"
+                },
+                "currentNetReceivables": {
+                    "type": "integer"
+                },
+                "deferredRevenue": {
+                    "type": "integer"
+                },
+                "fiscalDateEnding": {
+                    "type": "string"
+                },
+                "goodwill": {
+                    "type": "integer"
+                },
+                "intangibleAssets": {
+                    "type": "integer"
+                },
+                "intangibleAssetsExcludingGoodwill": {
+                    "type": "integer"
+                },
+                "inventory": {
+                    "type": "integer"
+                },
+                "investments": {
+                    "type": "integer"
+                },
+                "longTermDebt": {
+                    "type": "integer"
+                },
+                "longTermDebtNoncurrent": {
+                    "type": "integer"
+                },
+                "longTermInvestments": {
+                    "type": "integer"
+                },
+                "otherCurrentAssets": {
+                    "type": "integer"
+                },
+                "otherCurrentLiabilities": {
+                    "type": "integer"
+                },
+                "otherNonCurrentAssets": {
+                    "type": "integer"
+                },
+                "otherNonCurrentLiabilities": {
+                    "type": "integer"
+                },
+                "propertyPlantEquipment": {
+                    "type": "integer"
+                },
+                "reportedCurrency": {
+                    "type": "string"
+                },
+                "retainedEarnings": {
+                    "type": "integer"
+                },
+                "shortLongTermDebtTotal": {
+                    "type": "integer"
+                },
+                "shortTermDebt": {
+                    "type": "integer"
+                },
+                "shortTermInvestments": {
+                    "type": "integer"
+                },
+                "totalAssets": {
+                    "type": "integer"
+                },
+                "totalCurrentAssets": {
+                    "type": "integer"
+                },
+                "totalCurrentLiabilities": {
+                    "type": "integer"
+                },
+                "totalLiabilities": {
+                    "type": "integer"
+                },
+                "totalNonCurrentAssets": {
+                    "type": "integer"
+                },
+                "totalNonCurrentLiabilities": {
+                    "type": "integer"
+                },
+                "totalShareholderEquity": {
+                    "type": "integer"
+                },
+                "treasuryStock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.BalanceSheetQuarterlyReport": {
+            "type": "object",
+            "properties": {
+                "accumulatedDepreciationAmortizationPPE": {
+                    "type": "integer"
+                },
+                "capitalLeaseObligations": {
+                    "type": "integer"
+                },
+                "cashAndCashEquivalentsAtCarryingValue": {
+                    "type": "integer"
+                },
+                "cashAndShortTermInvestments": {
+                    "type": "integer"
+                },
+                "commonStock": {
+                    "type": "integer"
+                },
+                "commonStockSharesOutstanding": {
+                    "type": "integer"
+                },
+                "currentAccountsPayable": {
+                    "type": "integer"
+                },
+                "currentDebt": {
+                    "type": "integer"
+                },
+                "currentLongTermDebt": {
+                    "type": "integer"
+                },
+                "currentNetReceivables": {
+                    "type": "integer"
+                },
+                "deferredRevenue": {
+                    "type": "integer"
+                },
+                "fiscalDateEnding": {
+                    "type": "string"
+                },
+                "goodwill": {
+                    "type": "integer"
+                },
+                "intangibleAssets": {
+                    "type": "integer"
+                },
+                "intangibleAssetsExcludingGoodwill": {
+                    "type": "integer"
+                },
+                "inventory": {
+                    "type": "integer"
+                },
+                "investments": {
+                    "type": "integer"
+                },
+                "longTermDebt": {
+                    "type": "integer"
+                },
+                "longTermDebtNoncurrent": {
+                    "type": "integer"
+                },
+                "longTermInvestments": {
+                    "type": "integer"
+                },
+                "otherCurrentAssets": {
+                    "type": "integer"
+                },
+                "otherCurrentLiabilities": {
+                    "type": "integer"
+                },
+                "otherNonCurrentAssets": {
+                    "type": "integer"
+                },
+                "otherNonCurrentLiabilities": {
+                    "type": "integer"
+                },
+                "propertyPlantEquipment": {
+                    "type": "integer"
+                },
+                "reportedCurrency": {
+                    "type": "string"
+                },
+                "retainedEarnings": {
+                    "type": "integer"
+                },
+                "shortLongTermDebtTotal": {
+                    "type": "integer"
+                },
+                "shortTermDebt": {
+                    "type": "integer"
+                },
+                "shortTermInvestments": {
+                    "type": "integer"
+                },
+                "totalAssets": {
+                    "type": "integer"
+                },
+                "totalCurrentAssets": {
+                    "type": "integer"
+                },
+                "totalCurrentLiabilities": {
+                    "type": "integer"
+                },
+                "totalLiabilities": {
+                    "type": "integer"
+                },
+                "totalNonCurrentAssets": {
+                    "type": "integer"
+                },
+                "totalNonCurrentLiabilities": {
+                    "type": "integer"
+                },
+                "totalShareholderEquity": {
+                    "type": "integer"
+                },
+                "treasuryStock": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.CompanyOverview": {
+            "type": "object",
+            "properties": {
+                "200DayMovingAverage": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "50DayMovingAverage": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "52WeekHigh": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "52WeekLow": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "Address": {
+                    "type": "string"
+                },
+                "AnalystTargetPrice": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "AssetType": {
+                    "type": "string"
+                },
+                "Beta": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "BookValue": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "CIK": {
+                    "type": "string"
+                },
+                "Country": {
+                    "type": "string"
+                },
+                "Currency": {
+                    "type": "string"
+                },
+                "Description": {
+                    "type": "string"
+                },
+                "DilutedEPSTTM": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "DividendDate": {
+                    "description": "\"2023-06-10\"",
+                    "type": "string"
+                },
+                "DividendPerShare": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "DividendYield": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "EBITDA": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "EPS": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "EVToEBITDA": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "EVToRevenue": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "ExDividendDate": {
+                    "description": "\"2023-05-09\"",
+                    "type": "string"
+                },
+                "Exchange": {
+                    "type": "string"
+                },
+                "FiscalYearEnd": {
+                    "type": "string"
+                },
+                "ForwardPE": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "GrossProfitTTM": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "Industry": {
+                    "type": "string"
+                },
+                "LatestQuarter": {
+                    "description": "\"2023-03-31\"",
+                    "type": "string"
+                },
+                "MarketCapitalization": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "OperatingMarginTTM": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "PEGRatio": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "PERatio": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "PriceToBookRatio": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "PriceToSalesRatioTTM": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "ProfitMargin": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "QuarterlyEarningsGrowthYOY": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "QuarterlyRevenueGrowthYOY": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "ReturnOnAssetsTTM": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "ReturnOnEquityTTM": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "RevenuePerShareTTM": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "RevenueTTM": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "Sector": {
+                    "type": "string"
+                },
+                "SharesOutstanding": {
+                    "type": "string",
+                    "example": "0"
+                },
+                "Symbol": {
+                    "type": "string"
+                },
+                "TrailingPE": {
+                    "type": "string",
+                    "example": "0"
+                }
+            }
+        },
+        "models.DebtEBITDA": {
+            "type": "object",
+            "properties": {
+                "debt": {
+                    "description": "Montant de la dette",
+                    "type": "number"
+                },
+                "debt_to_ebitda": {
+                    "description": "Ratio dette/EBITDA",
+                    "type": "number"
+                },
+                "ebitda": {
+                    "description": "Montant de l'EBITDA",
+                    "type": "number"
+                }
+            }
+        },
+        "models.FreeCashFlow": {
+            "type": "object",
+            "properties": {
+                "fcf_per_share": {
+                    "description": "Free Cash Flow par action",
+                    "type": "number"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Growth": {
+            "type": "object",
+            "properties": {
+                "predictability_index": {
+                    "description": "Indice de prédictibilité",
+                    "type": "number"
+                },
+                "revenue_growth": {
+                    "description": "Croissance du chiffre d'affaires",
+                    "type": "number"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.Margins": {
+            "type": "object",
+            "properties": {
+                "capex_to_operating_income": {
+                    "description": "%CAPEX / Résultat opérationnel",
+                    "type": "number"
+                },
+                "gross_margin": {
+                    "description": "Marge brute",
+                    "type": "number"
+                },
+                "net_margin": {
+                    "description": "Marge nette",
+                    "type": "number"
+                },
+                "operating_margin": {
+                    "description": "Marge opérationnelle",
+                    "type": "number"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.RDExpenses": {
+            "type": "object",
+            "properties": {
+                "expenses": {
+                    "description": "Dépenses en R\u0026D",
+                    "type": "number"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ROCE": {
+            "type": "object",
+            "properties": {
+                "value": {
+                    "description": "Le ratio ROCE",
+                    "type": "number"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "models.ShareDilution": {
+            "type": "object",
+            "properties": {
+                "shares_outstanding": {
+                    "description": "Nombre d'actions en circulation",
+                    "type": "number"
+                },
+                "year": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pkg.BalanceSheetResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Balance Sheet data",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.BalanceSheet"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "The answer's status",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.DebtEBITDAResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Données sur la dette et l'EBITDA",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.DebtEBITDA"
+                    }
+                },
+                "status": {
+                    "description": "Statut de la réponse",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.ErrorResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "Code d'erreur HTTP",
+                    "type": "integer"
+                },
+                "message": {
+                    "description": "Message d'erreur",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Statut de la réponse, e.g., \"error\"",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.FreeCashFlowResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Données sur le Free Cash Flow",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.FreeCashFlow"
+                    }
+                },
+                "status": {
+                    "description": "Statut de la réponse",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.GrowthResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Données sur la croissance",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Growth"
+                    }
+                },
+                "status": {
+                    "description": "Statut de la réponse",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.MarginResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Données sur les marges",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Margins"
+                    }
+                },
+                "status": {
+                    "description": "Statut de la réponse",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.OverviewResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "The company's overview data",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.CompanyOverview"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "The answer's status",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.RDExpensesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Données sur les dépenses en R\u0026D",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.RDExpenses"
+                    }
+                },
+                "status": {
+                    "description": "Statut de la réponse",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.ROCEResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Données sur le ROCE",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ROCE"
+                    }
+                },
+                "status": {
+                    "description": "Statut de la réponse",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.ShareDilutionResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Données sur la dilution des actions",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.ShareDilution"
+                    }
+                },
+                "status": {
+                    "description": "Statut de la réponse",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}
