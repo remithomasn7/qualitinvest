@@ -1,0 +1,6 @@
+%syntax-version=1.0.0
+%project=qualitinvest
+%uri=https://github.com/qualitinvest/sqitch
+
+qualitinvestschema  2025-04-23T20:38:48Z rthomas,,, <rthomas@rthomas-BOHK-WAX9X> # Add schema for all qualitinvest objects.
+create_appuser      2025-10-04T22:44:00Z rthomas,,, <rthomas@rthomas-BOHK-WAX9X> # Create application user

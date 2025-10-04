@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: rthomas
+      POSTGRES_PASSWORD: rthomas
+      POSTGRES_DB: qualitinvest_db
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  sqitch:
+    image: sqitch/sqitch:v1.5
+    depends_on:
+      - db
+    volumes:
+      - ./sqitch:/sqitch
+    entrypoint: ["/sqitch/init.sh", "db", "5432"]
+
+
+volumes:
+  pgdata:
