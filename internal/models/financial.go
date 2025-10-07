@@ -1,50 +1,9 @@
 package models
 
-// ROCE représente le retour sur capital engagé.
-type ROCE struct {
-	Year  int     `json:"year"`
-	Value float64 `json:"value"` // Le ratio ROCE
-}
-
-// Margin représente les marges financières.
-type Margins struct {
-	Year                   int     `json:"year"`
-	GrossMargin            float64 `json:"gross_margin"`              // Marge brute
-	OperatingMargin        float64 `json:"operating_margin"`          // Marge opérationnelle
-	NetMargin              float64 `json:"net_margin"`                // Marge nette
-	CAPEXToOperatingIncome float64 `json:"capex_to_operating_income"` // %CAPEX / Résultat opérationnel
-}
-
-// Growth représente la croissance financière.
-type Growth struct {
-	Year                int     `json:"year"`
-	RevenueGrowth       float64 `json:"revenue_growth"`       // Croissance du chiffre d'affaires
-	PredictabilityIndex float64 `json:"predictability_index"` // Indice de prédictibilité
-}
-
-// FreeCashFlow représente le Free Cash Flow par action.
-type FreeCashFlow struct {
-	Year        int     `json:"year"`
-	FCFPerShare float64 `json:"fcf_per_share"` // Free Cash Flow par action
-}
-
 // ShareDilution représente la dilution des actions.
 type ShareDilution struct {
 	Year              int     `json:"year"`
 	SharesOutstanding float64 `json:"shares_outstanding"` // Nombre d'actions en circulation
-}
-
-// DebtEBITDA représente la dette et l'EBITDA.
-type DebtEBITDA struct {
-	Debt         float64 `json:"debt"`           // Montant de la dette
-	EBITDA       float64 `json:"ebitda"`         // Montant de l'EBITDA
-	DebtToEBITDA float64 `json:"debt_to_ebitda"` // Ratio dette/EBITDA
-}
-
-// RDExpenses représente les dépenses en recherche et développement.
-type RDExpenses struct {
-	Year     int     `json:"year"`
-	Expenses float64 `json:"expenses"` // Dépenses en R&D
 }
 
 type IncomeStatements struct {

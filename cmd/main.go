@@ -50,21 +50,6 @@ func main() {
 		v1.GET("/earnings", func(c *gin.Context) {
 			controllers.GetEarnings(c, apiClient)
 		})
-		v1.GET("/roce", func(c *gin.Context) {
-			controllers.GetROCE(c, apiClient)
-		})
-		v1.GET("/margins", func(c *gin.Context) {
-			controllers.GetMargins(c, apiClient)
-		})
-		v1.GET("/growth", func(c *gin.Context) {
-			controllers.GetGrowth(c, apiClient)
-		})
-		v1.GET("/debt", func(c *gin.Context) {
-			controllers.GetDebtEBITDA(c, apiClient)
-		})
-		v1.GET("/rd", func(c *gin.Context) {
-			controllers.GetRDExpenses(c, apiClient)
-		})
 	}
 
 	etf := router.Group("/api/v1/etf/:symbol")
