@@ -22,6 +22,24 @@ type OverviewResponse struct {
 	Data   models.CompanyOverview `json:"data"`   // The company's overview data
 }
 
+// ETFProfileResponse représente la réponse pour le profil d'un ETF.
+type ETFProfileResponse struct {
+	Status string            `json:"status"` // Statut de la réponse
+	Data   models.ETFProfile `json:"data"`   // Données du profil ETF
+}
+
+// DividendsResponse représente la réponse pour les dividendes.
+type DividendsResponse struct {
+	Status string           `json:"status"` // Statut de la réponse
+	Data   models.Dividends `json:"data"`   // Données sur les dividendes
+}
+
+// SplitsResponse représente la réponse pour les splits.
+type SplitsResponse struct {
+	Status string        `json:"status"` // Statut de la réponse
+	Data   models.Splits `json:"data"`   // Données sur les splits
+}
+
 // IncomeStatementsResponse represents the answer when the company's income statements are requested.
 type IncomeStatementsResponse struct {
 	Status string                  `json:"status"` // The answer's status
@@ -38,6 +56,18 @@ type BalanceSheetResponse struct {
 type CashFlowStatementsResponse struct {
 	Status string                    `json:"status"` // The answer's status
 	Data   models.CashFlowStatements `json:"data"`   // Cash Flow Statements data
+}
+
+// SharesOutstandingsResponse représente la réponse pour les actions en circulation.
+type SharesOutstandingsResponse struct {
+	Status string                    `json:"status"` // The answer's status
+	Data   models.SharesOutstandings `json:"data"`   // Shares Outstandings data
+}
+
+// EarningsResponse représente la réponse pour les bénéfices.
+type EarningsResponse struct {
+	Status string          `json:"status"` // Statut de la réponse
+	Data   models.Earnings `json:"data"`   // Données sur les bénéfices
 }
 
 // ROCEResponse représente la réponse pour le ratio ROCE.

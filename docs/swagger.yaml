@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  models.AnnualEarning:
+    properties:
+      fiscalDateEnding:
+        type: string
+      reportedEPS:
+        type: string
+    type: object
   models.BalanceSheet:
     properties:
       annualReports:
@@ -447,6 +454,64 @@ definitions:
         description: Montant de l'EBITDA
         type: number
     type: object
+  models.Dividend:
+    properties:
+      amount:
+        type: string
+      declaration_date:
+        type: string
+      ex_dividend_date:
+        type: string
+      payment_date:
+        type: string
+      record_date:
+        type: string
+    type: object
+  models.Dividends:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Dividend'
+        type: array
+      symbol:
+        type: string
+    type: object
+  models.ETFProfile:
+    properties:
+      dividend_yield:
+        type: string
+      holdings:
+        items:
+          $ref: '#/definitions/models.Holding'
+        type: array
+      inception_date:
+        type: string
+      leveraged:
+        type: string
+      net_assets:
+        type: string
+      net_expense_ratio:
+        type: string
+      portfolio_turnover:
+        type: string
+      sectors:
+        items:
+          $ref: '#/definitions/models.Sector'
+        type: array
+    type: object
+  models.Earnings:
+    properties:
+      annualEarnings:
+        items:
+          $ref: '#/definitions/models.AnnualEarning'
+        type: array
+      quarterlyEarnings:
+        items:
+          $ref: '#/definitions/models.QuarterlyEarning'
+        type: array
+      symbol:
+        type: string
+    type: object
   models.FreeCashFlow:
     properties:
       fcf_per_share:
@@ -466,6 +531,15 @@ definitions:
       year:
         type: integer
     type: object
+  models.Holding:
+    properties:
+      description:
+        type: string
+      symbol:
+        type: string
+      weight:
+        type: string
+    type: object
   models.Margins:
     properties:
       capex_to_operating_income:
@@ -483,6 +557,23 @@ definitions:
       year:
         type: integer
     type: object
+  models.QuarterlyEarning:
+    properties:
+      estimatedEPS:
+        type: string
+      fiscalDateEnding:
+        type: string
+      reportTime:
+        type: string
+      reportedDate:
+        type: string
+      reportedEPS:
+        type: string
+      surprise:
+        type: string
+      surprisePercentage:
+        type: string
+    type: object
   models.RDExpenses:
     properties:
       expenses:
@@ -499,13 +590,48 @@ definitions:
       year:
         type: integer
     type: object
-  models.ShareDilution:
+  models.Sector:
     properties:
-      shares_outstanding:
-        description: Nombre d'actions en circulation
-        type: number
-      year:
-        type: integer
+      sector:
+        type: string
+      weight:
+        type: string
+    type: object
+  models.SharesOutstanding:
+    properties:
+      date:
+        type: string
+      shares_outstanding_basic:
+        type: string
+      shares_outstanding_diluted:
+        type: string
+    type: object
+  models.SharesOutstandings:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.SharesOutstanding'
+        type: array
+      status:
+        type: string
+      symbol:
+        type: string
+    type: object
+  models.Split:
+    properties:
+      effective_date:
+        type: string
+      split_factor:
+        type: string
+    type: object
+  models.Splits:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/models.Split'
+        type: array
+      symbol:
+        type: string
     type: object
   pkg.BalanceSheetResponse:
     properties:
@@ -534,6 +660,36 @@ definitions:
         items:
           $ref: '#/definitions/models.DebtEBITDA'
         type: array
+      status:
+        description: Statut de la réponse
+        type: string
+    type: object
+  pkg.DividendsResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/models.Dividends'
+        description: Données sur les dividendes
+      status:
+        description: Statut de la réponse
+        type: string
+    type: object
+  pkg.ETFProfileResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/models.ETFProfile'
+        description: Données du profil ETF
+      status:
+        description: Statut de la réponse
+        type: string
+    type: object
+  pkg.EarningsResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/models.Earnings'
+        description: Données sur les bénéfices
       status:
         description: Statut de la réponse
         type: string
@@ -615,13 +771,22 @@ definitions:
         description: Statut de la réponse
         type: string
     type: object
-  pkg.ShareDilutionResponse:
+  pkg.SharesOutstandingsResponse:
     properties:
       data:
-        description: Données sur la dilution des actions
-        items:
-          $ref: '#/definitions/models.ShareDilution'
-        type: array
+        allOf:
+        - $ref: '#/definitions/models.SharesOutstandings'
+        description: Shares Outstandings data
+      status:
+        description: The answer's status
+        type: string
+    type: object
+  pkg.SplitsResponse:
+    properties:
+      data:
+        allOf:
+        - $ref: '#/definitions/models.Splits'
+        description: Données sur les splits
       status:
         description: Statut de la réponse
         type: string
@@ -672,6 +837,48 @@ paths:
           schema:
             $ref: '#/definitions/pkg.CashFlowStatementsResponse'
       summary: Get the company's cash flow statements
+      tags:
+      - Financials
+  /companies/{symbol}/dividends:
+    get:
+      description: Get the dividends for a given company.
+      parameters:
+      - description: Company Symbol
+        in: path
+        name: symbol
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.DividendsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Get the company's dividends
+      tags:
+      - Financials
+  /companies/{symbol}/earnings:
+    get:
+      description: Get the company's earnings.
+      parameters:
+      - description: Company Symbol
+        in: path
+        name: symbol
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.EarningsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Get the company's earnings
       tags:
       - Financials
   /companies/{symbol}/income:
@@ -737,6 +944,69 @@ paths:
           schema:
             $ref: '#/definitions/pkg.ROCEResponse'
       summary: Get ROCE for a company
+      tags:
+      - Financials
+  /companies/{symbol}/shares_outstandings:
+    get:
+      description: Get the company's shares outstandings.
+      parameters:
+      - description: Company Symbol
+        in: path
+        name: symbol
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.SharesOutstandingsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.SharesOutstandingsResponse'
+      summary: Get the company's shares outstandings
+      tags:
+      - Financials
+  /companies/{symbol}/splits:
+    get:
+      description: Get the splits for a given company.
+      parameters:
+      - description: Company Symbol
+        in: path
+        name: symbol
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.SplitsResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Get the historical stock splits
+      tags:
+      - Financials
+  /etf/{symbol}/profile:
+    get:
+      description: Get the profile for a given ETF.
+      parameters:
+      - description: ETF Symbol
+        in: path
+        name: symbol
+        required: true
+        type: string
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.ETFProfileResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
+      summary: Get ETF Profile
       tags:
       - Financials
   /financials/{symbol}/debt-ebitda:
@@ -858,30 +1128,6 @@ paths:
           schema:
             $ref: '#/definitions/pkg.ErrorResponse'
       summary: Get R&D Expenses Data
-      tags:
-      - Financials
-  /financials/{symbol}/share-dilution:
-    get:
-      description: Récupère le nombre d'actions en circulation pour une entreprise
-        donnée sur les 10 dernières années afin d'analyser la dilution des actionnaires.
-      parameters:
-      - description: Symbol de l'entreprise
-        in: path
-        name: symbol
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.ShareDilutionResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Get Share Dilution Data
       tags:
       - Financials
 swagger: "2.0"

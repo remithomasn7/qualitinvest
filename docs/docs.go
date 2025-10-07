@@ -79,6 +79,70 @@ const docTemplate = `{
                 }
             }
         },
+        "/companies/{symbol}/dividends": {
+            "get": {
+                "description": "Get the dividends for a given company.",
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get the company's dividends",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.DividendsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{symbol}/earnings": {
+            "get": {
+                "description": "Get the company's earnings.",
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get the company's earnings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.EarningsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/companies/{symbol}/income": {
             "get": {
                 "description": "Get the company's income statements.",
@@ -170,6 +234,102 @@ const docTemplate = `{
                         "description": "Internal Server Error",
                         "schema": {
                             "$ref": "#/definitions/pkg.ROCEResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{symbol}/shares_outstandings": {
+            "get": {
+                "description": "Get the company's shares outstandings.",
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get the company's shares outstandings",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.SharesOutstandingsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.SharesOutstandingsResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/companies/{symbol}/splits": {
+            "get": {
+                "description": "Get the splits for a given company.",
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get the historical stock splits",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Company Symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.SplitsResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/etf/{symbol}/profile": {
+            "get": {
+                "description": "Get the profile for a given ETF.",
+                "tags": [
+                    "Financials"
+                ],
+                "summary": "Get ETF Profile",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ETF Symbol",
+                        "name": "symbol",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ETFProfileResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
                         }
                     }
                 }
@@ -349,44 +509,20 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/financials/{symbol}/share-dilution": {
-            "get": {
-                "description": "Récupère le nombre d'actions en circulation pour une entreprise donnée sur les 10 dernières années afin d'analyser la dilution des actionnaires.",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Financials"
-                ],
-                "summary": "Get Share Dilution Data",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Symbol de l'entreprise",
-                        "name": "symbol",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ShareDilutionResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorResponse"
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
+        "models.AnnualEarning": {
+            "type": "object",
+            "properties": {
+                "fiscalDateEnding": {
+                    "type": "string"
+                },
+                "reportedEPS": {
+                    "type": "string"
+                }
+            }
+        },
         "models.BalanceSheet": {
             "type": "object",
             "properties": {
@@ -1043,6 +1179,95 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Dividend": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "string"
+                },
+                "declaration_date": {
+                    "type": "string"
+                },
+                "ex_dividend_date": {
+                    "type": "string"
+                },
+                "payment_date": {
+                    "type": "string"
+                },
+                "record_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Dividends": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Dividend"
+                    }
+                },
+                "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.ETFProfile": {
+            "type": "object",
+            "properties": {
+                "dividend_yield": {
+                    "type": "string"
+                },
+                "holdings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Holding"
+                    }
+                },
+                "inception_date": {
+                    "type": "string"
+                },
+                "leveraged": {
+                    "type": "string"
+                },
+                "net_assets": {
+                    "type": "string"
+                },
+                "net_expense_ratio": {
+                    "type": "string"
+                },
+                "portfolio_turnover": {
+                    "type": "string"
+                },
+                "sectors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Sector"
+                    }
+                }
+            }
+        },
+        "models.Earnings": {
+            "type": "object",
+            "properties": {
+                "annualEarnings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.AnnualEarning"
+                    }
+                },
+                "quarterlyEarnings": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.QuarterlyEarning"
+                    }
+                },
+                "symbol": {
+                    "type": "string"
+                }
+            }
+        },
         "models.FreeCashFlow": {
             "type": "object",
             "properties": {
@@ -1071,6 +1296,20 @@ const docTemplate = `{
                 }
             }
         },
+        "models.Holding": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                },
+                "weight": {
+                    "type": "string"
+                }
+            }
+        },
         "models.Margins": {
             "type": "object",
             "properties": {
@@ -1092,6 +1331,32 @@ const docTemplate = `{
                 },
                 "year": {
                     "type": "integer"
+                }
+            }
+        },
+        "models.QuarterlyEarning": {
+            "type": "object",
+            "properties": {
+                "estimatedEPS": {
+                    "type": "string"
+                },
+                "fiscalDateEnding": {
+                    "type": "string"
+                },
+                "reportTime": {
+                    "type": "string"
+                },
+                "reportedDate": {
+                    "type": "string"
+                },
+                "reportedEPS": {
+                    "type": "string"
+                },
+                "surprise": {
+                    "type": "string"
+                },
+                "surprisePercentage": {
+                    "type": "string"
                 }
             }
         },
@@ -1119,15 +1384,70 @@ const docTemplate = `{
                 }
             }
         },
-        "models.ShareDilution": {
+        "models.Sector": {
             "type": "object",
             "properties": {
-                "shares_outstanding": {
-                    "description": "Nombre d'actions en circulation",
-                    "type": "number"
+                "sector": {
+                    "type": "string"
                 },
-                "year": {
-                    "type": "integer"
+                "weight": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SharesOutstanding": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "shares_outstanding_basic": {
+                    "type": "string"
+                },
+                "shares_outstanding_diluted": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.SharesOutstandings": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.SharesOutstanding"
+                    }
+                },
+                "status": {
+                    "type": "string"
+                },
+                "symbol": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Split": {
+            "type": "object",
+            "properties": {
+                "effective_date": {
+                    "type": "string"
+                },
+                "split_factor": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Splits": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/models.Split"
+                    }
+                },
+                "symbol": {
+                    "type": "string"
                 }
             }
         },
@@ -1174,6 +1494,57 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/models.DebtEBITDA"
                     }
+                },
+                "status": {
+                    "description": "Statut de la réponse",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.DividendsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Données sur les dividendes",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Dividends"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "Statut de la réponse",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.ETFProfileResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Données du profil ETF",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.ETFProfile"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "Statut de la réponse",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.EarningsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Données sur les bénéfices",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Earnings"
+                        }
+                    ]
                 },
                 "status": {
                     "description": "Statut de la réponse",
@@ -1295,15 +1666,33 @@ const docTemplate = `{
                 }
             }
         },
-        "pkg.ShareDilutionResponse": {
+        "pkg.SharesOutstandingsResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "description": "Données sur la dilution des actions",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.ShareDilution"
-                    }
+                    "description": "Shares Outstandings data",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.SharesOutstandings"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "The answer's status",
+                    "type": "string"
+                }
+            }
+        },
+        "pkg.SplitsResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "description": "Données sur les splits",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.Splits"
+                        }
+                    ]
                 },
                 "status": {
                     "description": "Statut de la réponse",

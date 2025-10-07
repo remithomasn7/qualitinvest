@@ -27,16 +27,28 @@ func main() {
 	v1 := router.Group("/api/v1/companies/:symbol")
 	{
 		v1.GET("/overview", func(c *gin.Context) {
-			controllers.CompanyOverview(c, apiClient)
+			controllers.GetCompanyOverview(c, apiClient)
+		})
+		v1.GET("/dividends", func(c *gin.Context) {
+			controllers.GetDividends(c, apiClient)
+		})
+		v1.GET("/splits", func(c *gin.Context) {
+			controllers.GetSplits(c, apiClient)
 		})
 		v1.GET("/income", func(c *gin.Context) {
-			controllers.IncomeStatements(c, apiClient)
+			controllers.GetIncomeStatements(c, apiClient)
 		})
 		v1.GET("/balancesheet", func(c *gin.Context) {
-			controllers.BalanceSheet(c, apiClient)
+			controllers.GetBalanceSheet(c, apiClient)
 		})
 		v1.GET("/cashflow", func(c *gin.Context) {
-			controllers.CashFlowStatements(c, apiClient)
+			controllers.GetCashFlowStatements(c, apiClient)
+		})
+		v1.GET("/shares_outstandings", func(c *gin.Context) {
+			controllers.GetShareOutstandings(c, apiClient)
+		})
+		v1.GET("/earnings", func(c *gin.Context) {
+			controllers.GetEarnings(c, apiClient)
 		})
 		v1.GET("/roce", func(c *gin.Context) {
 			controllers.GetROCE(c, apiClient)
@@ -47,9 +59,6 @@ func main() {
 		v1.GET("/growth", func(c *gin.Context) {
 			controllers.GetGrowth(c, apiClient)
 		})
-		v1.GET("/shares", func(c *gin.Context) {
-			controllers.GetShareDilution(c, apiClient)
-		})
 		v1.GET("/debt", func(c *gin.Context) {
 			controllers.GetDebtEBITDA(c, apiClient)
 		})
@@ -58,6 +67,12 @@ func main() {
 		})
 	}
 
+	etf := router.Group("/api/v1/etf/:symbol")
+	{
+		etf.GET("/profile", func(c *gin.Context) {
+			controllers.GetETFProfile(c, apiClient)
+		})
+	}
 	// Route pour la documentation Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

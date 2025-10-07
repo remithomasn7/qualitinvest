@@ -110,6 +110,84 @@ type QuarterlyReportIncomeStatements struct {
 	NetIncome                         AVInt  `json:"netIncome"`
 }
 
+type Sector struct {
+	Sector string `json:"sector"`
+	Weight string `json:"weight"`
+}
+
+type Holding struct {
+	Symbol      string `json:"symbol"`
+	Description string `json:"description"`
+	Weight      string `json:"weight"`
+}
+
+type ETFProfile struct {
+	NetAssets         string    `json:"net_assets"`
+	NetExpenseRatio   string    `json:"net_expense_ratio"`
+	PortfolioTurnover string    `json:"portfolio_turnover"`
+	DividendYield     string    `json:"dividend_yield"`
+	InceptionDate     string    `json:"inception_date"`
+	Leveraged         string    `json:"leveraged"`
+	Sectors           []Sector  `json:"sectors"`
+	Holdings          []Holding `json:"holdings"`
+}
+
+type Dividend struct {
+	ExDividendDate  string `json:"ex_dividend_date"`
+	DeclarationDate string `json:"declaration_date"`
+	RecordDate      string `json:"record_date"`
+	PaymentDate     string `json:"payment_date"`
+	Amount          string `json:"amount"`
+}
+
+type Dividends struct {
+	Symbol string     `json:"symbol"`
+	Data   []Dividend `json:"data"`
+}
+
+type Split struct {
+	EffectiveDate string `json:"effective_date"`
+	SplitFactor   string `json:"split_factor"`
+}
+
+type Splits struct {
+	Symbol string  `json:"symbol"`
+	Data   []Split `json:"data"`
+}
+
+type SharesOutstanding struct {
+	Date                     string `json:"date"`
+	SharesOutstandingDiluted string `json:"shares_outstanding_diluted"`
+	SharesOutstandingBasic   string `json:"shares_outstanding_basic"`
+}
+
+type SharesOutstandings struct {
+	Symbol string              `json:"symbol"`
+	Status string              `json:"status"`
+	Data   []SharesOutstanding `json:"data"`
+}
+
+type AnnualEarning struct {
+	FiscalDateEnding string `json:"fiscalDateEnding"`
+	ReportedEPS      string `json:"reportedEPS"`
+}
+
+type QuarterlyEarning struct {
+	FiscalDateEnding   string `json:"fiscalDateEnding"`
+	ReportedDate       string `json:"reportedDate"`
+	ReportedEPS        string `json:"reportedEPS"`
+	EstimatedEPS       string `json:"estimatedEPS"`
+	Surprise           string `json:"surprise"`
+	SurprisePercentage string `json:"surprisePercentage"`
+	ReportTime         string `json:"reportTime"`
+}
+
+type Earnings struct {
+	Symbol            string             `json:"symbol"`
+	AnnualEarnings    []AnnualEarning    `json:"annualEarnings"`
+	QuarterlyEarnings []QuarterlyEarning `json:"quarterlyEarnings"`
+}
+
 // CompanyOverview contains all details needed to get the company overview.
 type CompanyOverview struct {
 	Symbol                     string  `json:"Symbol"`

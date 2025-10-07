@@ -31,6 +31,63 @@ func FetchCompanyOverview(apiClient *alpha_vantage.AlphaVantageClient, symbol st
 	return *overviewData, nil
 }
 
+func FetchETFProfile(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.ETFProfile, error) {
+	// Vérifie si les données sont en cache
+	if cachedData, found := financialCache.Get("etfprofile_" + symbol); found {
+		log.Printf("ETF Profile data found in cache for: %s", symbol)
+		return cachedData.(models.ETFProfile), nil
+	}
+
+	// Si non, appelle l'API AlphaVantage
+	etfProfileData, err := apiClient.ETFProfile(symbol)
+	if err != nil {
+		return models.ETFProfile{}, err
+	}
+
+	// Stocke les données en cache
+	financialCache.Set("etfprofile_"+symbol, *etfProfileData, cache.DefaultExpiration)
+
+	return *etfProfileData, nil
+}
+
+func FetchDividends(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.Dividends, error) {
+	// Check if data are in cache
+	if cachedData, found := financialCache.Get("dividends_" + symbol); found {
+		log.Printf("Dividends data found in cache for: %s", symbol)
+		return cachedData.(models.Dividends), nil
+	}
+
+	// If data are not in cache, call AlphaVantage API
+	dividendsData, err := apiClient.Dividends(symbol)
+	if err != nil {
+		return models.Dividends{}, err
+	}
+
+	// Store/Update data in cache
+	financialCache.Set("dividends_"+symbol, *dividendsData, cache.DefaultExpiration)
+
+	return *dividendsData, nil
+}
+
+func FetchSplits(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.Splits, error) {
+	// Check if data are in cache
+	if cachedData, found := financialCache.Get("splits_" + symbol); found {
+		log.Printf("Splits data found in cache for: %s", symbol)
+		return cachedData.(models.Splits), nil
+	}
+
+	// If data are not in cache, call AlphaVantage API
+	splitsData, err := apiClient.Splits(symbol)
+	if err != nil {
+		return models.Splits{}, err
+	}
+
+	// Store/Update data in cache
+	financialCache.Set("splits_"+symbol, *splitsData, cache.DefaultExpiration)
+
+	return *splitsData, nil
+}
+
 func FetchIncomeStatements(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.IncomeStatements, error) {
 	// Check if data are in cache
 	if cachedData, found := financialCache.Get("income_" + symbol); found {
@@ -86,6 +143,44 @@ func FetchCashFlowStatements(apiClient *alpha_vantage.AlphaVantageClient, symbol
 	financialCache.Set("cashflow_"+symbol, *cashFlowData, cache.DefaultExpiration)
 
 	return *cashFlowData, nil
+}
+
+func FetchSharesOutstandings(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.SharesOutstandings, error) {
+	// Check if data are in cache
+	if cachedData, found := financialCache.Get("shares_outstandings_" + symbol); found {
+		log.Printf("Shares Outstanding data successfuly found in cache for: %s", symbol)
+		return cachedData.(models.SharesOutstandings), nil
+	}
+
+	// If data are not in cache, call AlphaVantage API
+	sharesOutstandingsData, err := apiClient.SharesOutstandings(symbol)
+	if err != nil {
+		return models.SharesOutstandings{}, err
+	}
+
+	// Store/Update data in cache
+	financialCache.Set("shares_outstandings_"+symbol, *sharesOutstandingsData, cache.DefaultExpiration)
+
+	return *sharesOutstandingsData, nil
+}
+
+func FetchEarnings(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.Earnings, error) {
+	// Check if data are in cache
+	if cachedData, found := financialCache.Get("earnings_" + symbol); found {
+		log.Printf("Earnings data successfuly found in cache for: %s", symbol)
+		return cachedData.(models.Earnings), nil
+	}
+
+	// If data are not in cache, call AlphaVantage API
+	earningsData, err := apiClient.Earnings(symbol)
+	if err != nil {
+		return models.Earnings{}, err
+	}
+
+	// Store/Update data in cache
+	financialCache.Set("earnings_"+symbol, *earningsData, cache.DefaultExpiration)
+
+	return *earningsData, nil
 }
 
 func FetchROCE(apiClient *alpha_vantage.AlphaVantageClient, symbol string) ([]models.ROCE, error) {
@@ -157,23 +252,6 @@ func FetchFreeCashFlow(apiClient *alpha_vantage.AlphaVantageClient, symbol strin
 	financialCache.Set("fcf_"+symbol, fcfData, cache.DefaultExpiration)
 
 	return fcfData, nil
-}
-
-// FetchShareDilution récupère le nombre d'actions en circulation sur les 10 dernières années
-func FetchShareDilution(apiClient *alpha_vantage.AlphaVantageClient, symbol string) ([]models.ShareDilution, error) {
-	if cachedData, found := financialCache.Get("shares_" + symbol); found {
-		return cachedData.([]models.ShareDilution), nil
-	}
-
-	sharesData, err := apiClient.GetShareDilution(symbol) // Appel à l'API pour les actions en circulation
-	if err != nil {
-		return []models.ShareDilution{}, err
-	}
-
-	// Stocke les données en cache
-	financialCache.Set("shares_"+symbol, sharesData, cache.DefaultExpiration)
-
-	return sharesData, nil
 }
 
 // FetchDebtEBITDA récupère la dette et l'EBITDA pour calculer le ratio dette/EBITDA

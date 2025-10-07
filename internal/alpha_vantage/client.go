@@ -53,79 +53,151 @@ func (c *AlphaVantageClient) fetch(params map[string]string) ([]byte, error) {
 	return body, nil
 }
 
-func toCompanyOverview(buf []byte) (*models.CompanyOverview, error) {
-	var overview models.CompanyOverview
-	err := json.Unmarshal(buf, &overview)
-	if err != nil {
-		return nil, err
-	}
-	return &overview, nil
-}
-
 func (c *AlphaVantageClient) CompanyOverview(symbol string) (*models.CompanyOverview, error) {
+	overview := &models.CompanyOverview{}
+
 	params := map[string]string{
 		"function": "OVERVIEW",
 		"symbol":   symbol,
 	}
-
 	body, err := c.fetch(params)
 	if err != nil {
 		return nil, err
 	}
-
-	return toCompanyOverview(body)
-}
-
-func toIncomeStatements(buf []byte) (*models.IncomeStatements, error) {
-	incomeStatements := &models.IncomeStatements{}
-	if err := json.Unmarshal(buf, incomeStatements); err != nil {
+	err = json.Unmarshal(body, overview)
+	if err != nil {
 		return nil, err
 	}
-	return incomeStatements, nil
+	return overview, nil
 }
+
+func (c *AlphaVantageClient) ETFProfile(symbol string) (*models.ETFProfile, error) {
+	ETFProfile := &models.ETFProfile{}
+
+	params := map[string]string{
+		"function": "ETF_PROFILE",
+		"symbol":   symbol,
+	}
+	body, err := c.fetch(params)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(body, ETFProfile)
+	if err != nil {
+		return nil, err
+	}
+	return ETFProfile, nil
+}
+
+func (c *AlphaVantageClient) Dividends(symbol string) (*models.Dividends, error) {
+	dividends := &models.Dividends{}
+
+	params := map[string]string{
+		"function": "DIVIDENDS",
+		"symbol":   symbol,
+	}
+	body, err := c.fetch(params)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(body, dividends)
+	if err != nil {
+		return nil, err
+	}
+	return dividends, nil
+}
+
+func (c *AlphaVantageClient) SharesOutstandings(symbol string) (*models.SharesOutstandings, error) {
+	SharesOutstandings := &models.SharesOutstandings{}
+
+	params := map[string]string{
+		"function": "SHARES_OUTSTANDING",
+		"symbol":   symbol,
+	}
+	body, err := c.fetch(params)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(body, SharesOutstandings)
+	if err != nil {
+		return nil, err
+	}
+	return SharesOutstandings, nil
+}
+
+func (c *AlphaVantageClient) Earnings(symbol string) (*models.Earnings, error) {
+	earnings := &models.Earnings{}
+
+	params := map[string]string{
+		"function": "EARNINGS",
+		"symbol":   symbol,
+	}
+	body, err := c.fetch(params)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(body, earnings)
+	if err != nil {
+		return nil, err
+	}
+	return earnings, nil
+}
+
+func (c *AlphaVantageClient) Splits(symbol string) (*models.Splits, error) {
+	splits := &models.Splits{}
+
+	params := map[string]string{
+		"function": "SPLITS",
+		"symbol":   symbol,
+	}
+	body, err := c.fetch(params)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(body, splits)
+	if err != nil {
+		return nil, err
+	}
+	return splits, nil
+}
+
 func (c *AlphaVantageClient) IncomeStatements(symbol string) (*models.IncomeStatements, error) {
+	incomeStatements := &models.IncomeStatements{}
+
 	params := map[string]string{
 		"function": "INCOME_STATEMENT",
 		"symbol":   symbol,
 	}
-
 	body, err := c.fetch(params)
 	if err != nil {
 		return nil, err
 	}
-
-	return toIncomeStatements(body)
-}
-
-func toBalanceSheet(buf []byte) (*models.BalanceSheet, error) {
-	balancesheet := &models.BalanceSheet{}
-	if err := json.Unmarshal(buf, balancesheet); err != nil {
+	if err = json.Unmarshal(body, incomeStatements); err != nil {
 		return nil, err
 	}
-	return balancesheet, nil
+	return incomeStatements, nil
 }
+
 func (c *AlphaVantageClient) BalanceSheet(symbol string) (*models.BalanceSheet, error) {
+	balancesheet := &models.BalanceSheet{}
+
 	params := map[string]string{
 		"function": "BALANCE_SHEET",
 		"symbol":   symbol,
 	}
-
 	body, err := c.fetch(params)
 	if err != nil {
 		return nil, err
 	}
-
-	return toBalanceSheet(body)
-}
-
-func toCashFlowStatements(buf []byte) (*models.CashFlowStatements, error) {
-	cashFlowStatements := &models.CashFlowStatements{}
-	if err := json.Unmarshal(buf, cashFlowStatements); err != nil {
+	if err = json.Unmarshal(body, balancesheet); err != nil {
 		return nil, err
 	}
-	return cashFlowStatements, nil
+	return balancesheet, nil
 }
+
 func (c *AlphaVantageClient) CashFlowStatements(symbol string) (*models.CashFlowStatements, error) {
+	cashFlowStatements := &models.CashFlowStatements{}
+
 	params := map[string]string{
 		"function": "CASH_FLOW",
 		"symbol":   symbol,
@@ -135,8 +207,10 @@ func (c *AlphaVantageClient) CashFlowStatements(symbol string) (*models.CashFlow
 	if err != nil {
 		return nil, err
 	}
-
-	return toCashFlowStatements(body)
+	if err = json.Unmarshal(body, cashFlowStatements); err != nil {
+		return nil, err
+	}
+	return cashFlowStatements, nil
 }
 
 func (c *AlphaVantageClient) GetROCE(symbol string) ([]models.ROCE, error) {
@@ -208,23 +282,6 @@ func (c *AlphaVantageClient) GetFreeCashFlow(symbol string) ([]models.FreeCashFl
 	// fcf.FCFPerShare = result["FCF"].(float64)
 
 	return fcf, nil
-}
-
-func (c *AlphaVantageClient) GetShareDilution(symbol string) ([]models.ShareDilution, error) {
-	// params := map[string]string{
-	// 	"function": "GET_SHARE_DILUTION",
-	// 	"symbol":   symbol,
-	// }
-	// result, err := c.fetch("", params)
-	// if err != nil {
-	// 	return models.ShareDilution{}, err
-	// }
-
-	var share []models.ShareDilution
-	// Mapper le résultat en modèle Growth ici
-	// share.SharesOutstanding = result["SHARE"].(float64)
-
-	return share, nil
 }
 
 func (c *AlphaVantageClient) GetDebtEBITDA(symbol string) ([]models.DebtEBITDA, error) {
