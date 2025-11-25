@@ -15,10 +15,10 @@ until pg_isready -h "$host" -p "$port"; do
   sleep 1
 done
 
->&2 echo "Postgres is up - Initializing Database"
+>&2 echo "Postgres is up - deploying migrations"
 
 # Deploy Sqitch migrations
-sqitch deploy db:pg://rthomas:rthomas@db:5432/qualitinvest_db
+sqitch deploy db:pg://$DB_USER:$DB_PASSWORD@$host:$port/$DB_NAME
 
 # Check if a backup file exists
 if [ -f "/sqitch/backup.sql" ]; then

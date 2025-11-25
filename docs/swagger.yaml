@@ -1,24 +1,60 @@
-basePath: /api/v1
+basePath: /
 definitions:
-  models.AnnualEarning:
+  models.AnnualReportIncomeStatements:
     properties:
+      comprehensiveIncomeNetOfTax:
+        type: integer
+      costOfRevenue:
+        type: integer
+      costofGoodsAndServicesSold:
+        type: integer
+      depreciation:
+        type: integer
+      depreciationAndAmortization:
+        type: integer
+      ebit:
+        type: integer
+      ebitda:
+        type: integer
       fiscalDateEnding:
         type: string
-      reportedEPS:
+      grossProfit:
+        type: integer
+      incomeBeforeTax:
+        type: integer
+      incomeTaxExpense:
+        type: integer
+      interestAndDebtExpense:
+        type: integer
+      interestExpense:
+        type: integer
+      interestIncome:
+        type: integer
+      investmentIncomeNet:
+        description: Have to handle case where value is "None"
+        type: integer
+      netIncome:
+        type: integer
+      netIncomeFromContinuingOperations:
+        type: integer
+      netInterestIncome:
+        type: integer
+      nonInterestIncome:
+        type: integer
+      operatingExpenses:
+        type: integer
+      operatingIncome:
+        type: integer
+      otherNonOperatingIncome:
+        type: integer
+      reportedCurrency:
         type: string
-    type: object
-  models.BalanceSheet:
-    properties:
-      annualReports:
-        items:
-          $ref: '#/definitions/models.BalanceSheetAnnualReport'
-        type: array
-      quarterlyReports:
-        items:
-          $ref: '#/definitions/models.BalanceSheetQuarterlyReport'
-        type: array
-      symbol:
-        type: string
+      researchAndDevelopment:
+        type: integer
+      sellingGeneralAndAdministrative:
+        type: integer
+      totalRevenue:
+        type: integer
     type: object
   models.BalanceSheetAnnualReport:
     properties:
@@ -99,98 +135,6 @@ definitions:
       treasuryStock:
         type: integer
     type: object
-  models.BalanceSheetQuarterlyReport:
-    properties:
-      accumulatedDepreciationAmortizationPPE:
-        type: integer
-      capitalLeaseObligations:
-        type: integer
-      cashAndCashEquivalentsAtCarryingValue:
-        type: integer
-      cashAndShortTermInvestments:
-        type: integer
-      commonStock:
-        type: integer
-      commonStockSharesOutstanding:
-        type: integer
-      currentAccountsPayable:
-        type: integer
-      currentDebt:
-        type: integer
-      currentLongTermDebt:
-        type: integer
-      currentNetReceivables:
-        type: integer
-      deferredRevenue:
-        type: integer
-      fiscalDateEnding:
-        type: string
-      goodwill:
-        type: integer
-      intangibleAssets:
-        type: integer
-      intangibleAssetsExcludingGoodwill:
-        type: integer
-      inventory:
-        type: integer
-      investments:
-        type: integer
-      longTermDebt:
-        type: integer
-      longTermDebtNoncurrent:
-        type: integer
-      longTermInvestments:
-        type: integer
-      otherCurrentAssets:
-        type: integer
-      otherCurrentLiabilities:
-        type: integer
-      otherNonCurrentAssets:
-        type: integer
-      otherNonCurrentLiabilities:
-        type: integer
-      propertyPlantEquipment:
-        type: integer
-      reportedCurrency:
-        type: string
-      retainedEarnings:
-        type: integer
-      shortLongTermDebtTotal:
-        type: integer
-      shortTermDebt:
-        type: integer
-      shortTermInvestments:
-        type: integer
-      totalAssets:
-        type: integer
-      totalCurrentAssets:
-        type: integer
-      totalCurrentLiabilities:
-        type: integer
-      totalLiabilities:
-        type: integer
-      totalNonCurrentAssets:
-        type: integer
-      totalNonCurrentLiabilities:
-        type: integer
-      totalShareholderEquity:
-        type: integer
-      treasuryStock:
-        type: integer
-    type: object
-  models.CashFlowStatements:
-    properties:
-      annualReports:
-        items:
-          $ref: '#/definitions/models.CashFlowStatementsAnnualReport'
-        type: array
-      quarterlyReports:
-        items:
-          $ref: '#/definitions/models.CashFlowStatementsQuarterlyReport'
-        type: array
-      symbol:
-        type: string
-    type: object
   models.CashFlowStatementsAnnualReport:
     properties:
       capitalExpenditures:
@@ -252,66 +196,45 @@ definitions:
       reportedCurrency:
         type: string
     type: object
-  models.CashFlowStatementsQuarterlyReport:
+  models.Company:
     properties:
-      capitalExpenditures:
-        type: integer
-      cashflowFromFinancing:
-        type: integer
-      cashflowFromInvestment:
-        type: integer
-      changeInCashAndCashEquivalents:
-        type: integer
-      changeInExchangeRate:
-        type: integer
-      changeInInventory:
-        type: integer
-      changeInOperatingAssets:
-        type: integer
-      changeInOperatingLiabilities:
-        type: integer
-      changeInReceivables:
-        type: integer
-      depreciationDepletionAndAmortization:
-        type: integer
-      dividendPayout:
-        type: integer
-      dividendPayoutCommonStock:
-        type: integer
-      dividendPayoutPreferredStock:
-        type: integer
-      fiscalDateEnding:
+      country:
         type: string
-      netIncome:
-        type: integer
-      operatingCashflow:
-        type: integer
-      paymentsForOperatingActivities:
-        type: integer
-      paymentsForRepurchaseOfCommonStock:
-        type: integer
-      paymentsForRepurchaseOfEquity:
-        type: integer
-      paymentsForRepurchaseOfPreferredStock:
-        type: integer
-      proceedsFromIssuanceOfCommonStock:
-        type: integer
-      proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet:
-        type: integer
-      proceedsFromIssuanceOfPreferredStock:
-        type: integer
-      proceedsFromOperatingActivities:
-        type: integer
-      proceedsFromRepaymentsOfShortTermDebt:
-        type: integer
-      proceedsFromRepurchaseOfEquity:
-        type: integer
-      proceedsFromSaleOfTreasuryStock:
-        type: integer
-      profitLoss:
-        type: integer
-      reportedCurrency:
+      currency:
         type: string
+      exchange:
+        type: string
+      id:
+        type: integer
+      industry:
+        type: string
+      name:
+        type: string
+      sector:
+        type: string
+      symbol:
+        type: string
+    type: object
+  models.CompanyAnalysis:
+    properties:
+      calculated_ratios:
+        allOf:
+        - $ref: '#/definitions/models.FinancialRatios'
+        description: Ratios calculés
+      company:
+        $ref: '#/definitions/models.Company'
+      growth_metrics:
+        allOf:
+        - $ref: '#/definitions/models.GrowthMetrics'
+        description: Métriques dérivées
+      latest_balance:
+        $ref: '#/definitions/models.BalanceSheetAnnualReport'
+      latest_cash_flow:
+        $ref: '#/definitions/models.CashFlowStatementsAnnualReport'
+      latest_income:
+        $ref: '#/definitions/models.AnnualReportIncomeStatements'
+      overview:
+        $ref: '#/definitions/models.CompanyOverview'
     type: object
   models.CompanyOverview:
     properties:
@@ -442,254 +365,165 @@ definitions:
         example: "0"
         type: string
     type: object
-  models.DebtEBITDA:
+  models.FairValue:
     properties:
-      debt:
-        description: Montant de la dette
+      estimated_value:
         type: number
-      debt_to_ebitda:
-        description: Ratio dette/EBITDA
-        type: number
-      ebitda:
-        description: Montant de l'EBITDA
+      method:
+        type: string
+      upside:
         type: number
     type: object
-  models.Dividend:
+  models.FinancialRatios:
     properties:
-      amount:
-        type: string
-      declaration_date:
-        type: string
-      ex_dividend_date:
-        type: string
-      payment_date:
-        type: string
-      record_date:
-        type: string
-    type: object
-  models.Dividends:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/models.Dividend'
-        type: array
-      symbol:
-        type: string
-    type: object
-  models.ETFProfile:
-    properties:
-      dividend_yield:
-        type: string
-      holdings:
-        items:
-          $ref: '#/definitions/models.Holding'
-        type: array
-      inception_date:
-        type: string
-      leveraged:
-        type: string
-      net_assets:
-        type: string
-      net_expense_ratio:
-        type: string
-      portfolio_turnover:
-        type: string
-      sectors:
-        items:
-          $ref: '#/definitions/models.Sector'
-        type: array
-    type: object
-  models.Earnings:
-    properties:
-      annualEarnings:
-        items:
-          $ref: '#/definitions/models.AnnualEarning'
-        type: array
-      quarterlyEarnings:
-        items:
-          $ref: '#/definitions/models.QuarterlyEarning'
-        type: array
-      symbol:
-        type: string
-    type: object
-  models.FreeCashFlow:
-    properties:
-      fcf_per_share:
-        description: Free Cash Flow par action
+      asset_turnover:
         type: number
-      year:
-        type: integer
-    type: object
-  models.Growth:
-    properties:
-      predictability_index:
-        description: Indice de prédictibilité
+      debt_to_assets:
         type: number
-      revenue_growth:
-        description: Croissance du chiffre d'affaires
+      debt_to_equity:
         type: number
-      year:
-        type: integer
-    type: object
-  models.Holding:
-    properties:
-      description:
-        type: string
-      symbol:
-        type: string
-      weight:
-        type: string
-    type: object
-  models.Margins:
-    properties:
-      capex_to_operating_income:
-        description: '%CAPEX / Résultat opérationnel'
+      earnings_growth_yoy:
         type: number
+      fiscal_date:
+        type: string
       gross_margin:
-        description: Marge brute
+        type: number
+      inventory_turnover:
         type: number
       net_margin:
-        description: Marge nette
         type: number
       operating_margin:
-        description: Marge opérationnelle
         type: number
-      year:
-        type: integer
-    type: object
-  models.QuarterlyEarning:
-    properties:
-      estimatedEPS:
-        type: string
-      fiscalDateEnding:
-        type: string
-      reportTime:
-        type: string
-      reportedDate:
-        type: string
-      reportedEPS:
-        type: string
-      surprise:
-        type: string
-      surprisePercentage:
-        type: string
-    type: object
-  models.RDExpenses:
-    properties:
-      expenses:
-        description: Dépenses en R&D
+      pb_ratio:
         type: number
-      year:
-        type: integer
-    type: object
-  models.ROCE:
-    properties:
-      value:
-        description: Le ratio ROCE
+      pe_ratio:
         type: number
-      year:
-        type: integer
+      price_to_sales_ratio:
+        type: number
+      revenue_growth_yoy:
+        type: number
     type: object
-  models.Sector:
+  models.GrowthMetrics:
     properties:
+      earnings_growth_1y:
+        type: number
+      earnings_growth_3y:
+        type: number
+      revenue_growth_1y:
+        type: number
+      revenue_growth_3y:
+        type: number
+    type: object
+  models.HistoricalRatios:
+    properties:
+      fiscal_date:
+        type: string
+      ratios:
+        $ref: '#/definitions/models.ValuationRatios'
+    type: object
+  models.PeerCompany:
+    properties:
+      market_cap:
+        type: integer
+      name:
+        type: string
+      pb_ratio:
+        type: number
+      pe_ratio:
+        type: number
+      symbol:
+        type: string
+    type: object
+  models.ScreeningResult:
+    properties:
+      beta:
+        type: number
+      company_id:
+        type: integer
+      industry:
+        type: string
+      market_cap:
+        type: integer
+      name:
+        type: string
+      pb_ratio:
+        type: number
+      pe_ratio:
+        type: number
+      price_to_sales:
+        type: number
+      profit_margin:
+        type: number
+      roa:
+        type: number
+      roe:
+        type: number
+      score:
+        description: Score calculé basé sur les critères
+        type: number
       sector:
         type: string
-      weight:
-        type: string
-    type: object
-  models.SharesOutstanding:
-    properties:
-      date:
-        type: string
-      shares_outstanding_basic:
-        type: string
-      shares_outstanding_diluted:
-        type: string
-    type: object
-  models.SharesOutstandings:
-    properties:
-      data:
-        items:
-          $ref: '#/definitions/models.SharesOutstanding'
-        type: array
-      status:
-        type: string
       symbol:
         type: string
     type: object
-  models.Split:
+  models.SectorAverages:
     properties:
-      effective_date:
-        type: string
-      split_factor:
-        type: string
+      avg_pb_ratio:
+        type: number
+      avg_pe_ratio:
+        type: number
+      avg_profit_margin:
+        type: number
+      avg_revenue_growth:
+        type: number
+      avg_roe:
+        type: number
+      company_count:
+        type: integer
     type: object
-  models.Splits:
+  models.SectorComparison:
     properties:
-      data:
+      company:
+        $ref: '#/definitions/models.Company'
+      peer_companies:
         items:
-          $ref: '#/definitions/models.Split'
+          $ref: '#/definitions/models.PeerCompany'
+        type: array
+      sector_averages:
+        $ref: '#/definitions/models.SectorAverages'
+    type: object
+  models.ValuationAnalysis:
+    properties:
+      current_ratios:
+        $ref: '#/definitions/models.ValuationRatios'
+      fair_value:
+        $ref: '#/definitions/models.FairValue'
+      historical_ratios:
+        items:
+          $ref: '#/definitions/models.HistoricalRatios'
         type: array
       symbol:
         type: string
     type: object
-  pkg.BalanceSheetResponse:
+  models.ValuationRatios:
+    properties:
+      enterprise_value_ebit:
+        type: number
+      pb_ratio:
+        type: number
+      pe_ratio:
+        type: number
+      price_to_cash_flow:
+        type: number
+      price_to_sales:
+        type: number
+    type: object
+  pkg.CompanyAnalysisResponse:
     properties:
       data:
         allOf:
-        - $ref: '#/definitions/models.BalanceSheet'
-        description: Balance Sheet data
-      status:
-        description: The answer's status
-        type: string
-    type: object
-  pkg.CashFlowStatementsResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.CashFlowStatements'
-        description: Cash Flow Statements data
-      status:
-        description: The answer's status
-        type: string
-    type: object
-  pkg.DebtEBITDAResponse:
-    properties:
-      data:
-        description: Données sur la dette et l'EBITDA
-        items:
-          $ref: '#/definitions/models.DebtEBITDA'
-        type: array
-      status:
-        description: Statut de la réponse
-        type: string
-    type: object
-  pkg.DividendsResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.Dividends'
-        description: Données sur les dividendes
-      status:
-        description: Statut de la réponse
-        type: string
-    type: object
-  pkg.ETFProfileResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.ETFProfile'
-        description: Données du profil ETF
-      status:
-        description: Statut de la réponse
-        type: string
-    type: object
-  pkg.EarningsResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.Earnings'
-        description: Données sur les bénéfices
+        - $ref: '#/definitions/models.CompanyAnalysis'
+        description: Analyse complète de l'entreprise
       status:
         description: Statut de la réponse
         type: string
@@ -706,90 +540,114 @@ definitions:
         description: Statut de la réponse, e.g., "error"
         type: string
     type: object
-  pkg.FreeCashFlowResponse:
+  pkg.ScreeningResponse:
     properties:
+      count:
+        description: Nombre de résultats
+        type: integer
       data:
-        description: Données sur le Free Cash Flow
+        description: Résultats du screening
         items:
-          $ref: '#/definitions/models.FreeCashFlow'
+          $ref: '#/definitions/models.ScreeningResult'
         type: array
       status:
         description: Statut de la réponse
         type: string
     type: object
-  pkg.GrowthResponse:
+  pkg.ScreeningTemplate:
     properties:
-      data:
-        description: Données sur la croissance
-        items:
-          $ref: '#/definitions/models.Growth'
-        type: array
+      criteria:
+        description: Critères du template
+      description:
+        description: Description
+        type: string
+      name:
+        description: Nom du template
+        type: string
+    type: object
+  pkg.ScreeningTemplatesResponse:
+    properties:
       status:
         description: Statut de la réponse
         type: string
-    type: object
-  pkg.MarginResponse:
-    properties:
-      data:
-        description: Données sur les marges
+      templates:
+        description: Liste des templates
         items:
-          $ref: '#/definitions/models.Margins'
+          $ref: '#/definitions/pkg.ScreeningTemplate'
         type: array
-      status:
-        description: Statut de la réponse
-        type: string
     type: object
-  pkg.OverviewResponse:
+  pkg.SectorComparisonResponse:
     properties:
       data:
         allOf:
-        - $ref: '#/definitions/models.CompanyOverview'
-        description: The company's overview data
-      status:
-        description: The answer's status
-        type: string
-    type: object
-  pkg.RDExpensesResponse:
-    properties:
-      data:
-        description: Données sur les dépenses en R&D
-        items:
-          $ref: '#/definitions/models.RDExpenses'
-        type: array
+        - $ref: '#/definitions/models.SectorComparison'
+        description: Comparaison sectorielle
       status:
         description: Statut de la réponse
         type: string
     type: object
-  pkg.ROCEResponse:
+  pkg.SuccessResponse:
     properties:
-      data:
-        description: Données sur le ROCE
-        items:
-          $ref: '#/definitions/models.ROCE'
-        type: array
+      message:
+        description: Message de succès
+        type: string
       status:
         description: Statut de la réponse
         type: string
     type: object
-  pkg.SharesOutstandingsResponse:
+  pkg.ValuationAnalysisResponse:
     properties:
       data:
         allOf:
-        - $ref: '#/definitions/models.SharesOutstandings'
-        description: Shares Outstandings data
-      status:
-        description: The answer's status
-        type: string
-    type: object
-  pkg.SplitsResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.Splits'
-        description: Données sur les splits
+        - $ref: '#/definitions/models.ValuationAnalysis'
+        description: Analyse de valorisation
       status:
         description: Statut de la réponse
         type: string
+    type: object
+  services.ScreeningCriteria:
+    properties:
+      limit:
+        description: Limit results
+        type: integer
+      max_debt_to_equity:
+        description: Financial health
+        type: number
+      max_market_cap:
+        type: integer
+      max_pb_ratio:
+        type: number
+      max_pe_ratio:
+        type: number
+      min_current_ratio:
+        type: number
+      min_eps_growth:
+        type: number
+      min_market_cap:
+        description: Size
+        type: integer
+      min_pb_ratio:
+        type: number
+      min_pe_ratio:
+        description: Valuation ratios
+        type: number
+      min_price_to_sales:
+        type: number
+      min_profit_margin:
+        type: number
+      min_revenue_growth:
+        description: Growth
+        type: number
+      min_roa:
+        type: number
+      min_roe:
+        description: Profitability
+        type: number
+      sectors:
+        description: Sectors (optionnel)
+        items:
+          type: string
+        type: array
     type: object
 info:
   contact: {}
@@ -797,224 +655,13 @@ info:
   title: My Investment API
   version: "1.0"
 paths:
-  /companies/{symbol}/balancesheet:
+  /api/v1/analysis/{symbol}:
     get:
-      description: Get the company's balance sheet.
+      consumes:
+      - application/json
+      description: Get comprehensive fundamental analysis for a specific company
       parameters:
       - description: Company Symbol
-        in: path
-        name: symbol
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.BalanceSheetResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.BalanceSheetResponse'
-      summary: Get the company's balance sheet
-      tags:
-      - Financials
-  /companies/{symbol}/cashflow:
-    get:
-      description: Get the company's cash flow statements.
-      parameters:
-      - description: Company Symbol
-        in: path
-        name: symbol
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.CashFlowStatementsResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.CashFlowStatementsResponse'
-      summary: Get the company's cash flow statements
-      tags:
-      - Financials
-  /companies/{symbol}/dividends:
-    get:
-      description: Get the dividends for a given company.
-      parameters:
-      - description: Company Symbol
-        in: path
-        name: symbol
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.DividendsResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Get the company's dividends
-      tags:
-      - Financials
-  /companies/{symbol}/earnings:
-    get:
-      description: Get the company's earnings.
-      parameters:
-      - description: Company Symbol
-        in: path
-        name: symbol
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.EarningsResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Get the company's earnings
-      tags:
-      - Financials
-  /companies/{symbol}/income:
-    get:
-      description: Get the company's income statements.
-      parameters:
-      - description: Company Symbol
-        in: path
-        name: symbol
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.OverviewResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.OverviewResponse'
-      summary: Get the company's income statements
-      tags:
-      - Financials
-  /companies/{symbol}/overview:
-    get:
-      description: Get the overview  for a given company.
-      parameters:
-      - description: Company Symbol
-        in: path
-        name: symbol
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.OverviewResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.OverviewResponse'
-      summary: Get an Overview of a company
-      tags:
-      - Financials
-  /companies/{symbol}/roce:
-    get:
-      description: Get the ROCE ratio for the last 10 years for a given company. ROCE
-        is a measure of how efficiently a company is using its capital to generate
-        profits.
-      parameters:
-      - description: Company Symbol
-        in: path
-        name: symbol
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.ROCEResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ROCEResponse'
-      summary: Get ROCE for a company
-      tags:
-      - Financials
-  /companies/{symbol}/shares_outstandings:
-    get:
-      description: Get the company's shares outstandings.
-      parameters:
-      - description: Company Symbol
-        in: path
-        name: symbol
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.SharesOutstandingsResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.SharesOutstandingsResponse'
-      summary: Get the company's shares outstandings
-      tags:
-      - Financials
-  /companies/{symbol}/splits:
-    get:
-      description: Get the splits for a given company.
-      parameters:
-      - description: Company Symbol
-        in: path
-        name: symbol
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.SplitsResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Get the historical stock splits
-      tags:
-      - Financials
-  /etf/{symbol}/profile:
-    get:
-      description: Get the profile for a given ETF.
-      parameters:
-      - description: ETF Symbol
-        in: path
-        name: symbol
-        required: true
-        type: string
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.ETFProfileResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Get ETF Profile
-      tags:
-      - Financials
-  /financials/{symbol}/debt-ebitda:
-    get:
-      description: Récupère la dette et l'EBITDA d'une entreprise sur les 10 dernières
-        années pour calculer le ratio dette/EBITDA.
-      parameters:
-      - description: Symbol de l'entreprise
         in: path
         name: symbol
         required: true
@@ -1025,20 +672,25 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/pkg.DebtEBITDAResponse'
+            $ref: '#/definitions/pkg.CompanyAnalysisResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Get Debt to EBITDA Data
+      summary: Get detailed company analysis
       tags:
-      - Financials
-  /financials/{symbol}/free-cash-flow:
+      - Analysis
+  /api/v1/analysis/{symbol}/sector:
     get:
-      description: Récupère le Free Cash Flow par action sur les 10 dernières années
-        pour une entreprise donnée.
+      consumes:
+      - application/json
+      description: Compare company metrics with sector averages and peers
       parameters:
-      - description: Symbol de l'entreprise
+      - description: Company Symbol
         in: path
         name: symbol
         required: true
@@ -1049,21 +701,25 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/pkg.FreeCashFlowResponse'
+            $ref: '#/definitions/pkg.SectorComparisonResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Get Free Cash Flow Data
+      summary: Get sector comparison for a company
       tags:
-      - Financials
-  /financials/{symbol}/growth:
+      - Analysis
+  /api/v1/analysis/{symbol}/valuation:
     get:
-      description: Récupère le taux de croissance du chiffre d'affaires et un indice
-        de prévisibilité du chiffre d'affaires pour une entreprise sur les 10 dernières
-        années.
+      consumes:
+      - application/json
+      description: Get detailed valuation analysis with fair value estimates
       parameters:
-      - description: Symbol de l'entreprise
+      - description: Company Symbol
         in: path
         name: symbol
         required: true
@@ -1074,20 +730,26 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/pkg.GrowthResponse'
+            $ref: '#/definitions/pkg.ValuationAnalysisResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Get Growth Data
+      summary: Get valuation analysis for a company
       tags:
-      - Financials
-  /financials/{symbol}/margins:
-    get:
-      description: Récupère les marges brute, opérationnelle, nette, et le ratio CAPEX/Résultat
-        opérationnel pour une entreprise donnée sur les 10 dernières années.
+      - Analysis
+  /api/v1/collect/{symbol}:
+    post:
+      consumes:
+      - application/json
+      description: Manually trigger data collection from Alpha Vantage for a specific
+        company
       parameters:
-      - description: Symbol de l'entreprise
+      - description: Company Symbol
         in: path
         name: symbol
         required: true
@@ -1098,36 +760,58 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/pkg.MarginResponse'
+            $ref: '#/definitions/pkg.SuccessResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Get Margins Data
+      summary: Trigger data collection for a company
       tags:
-      - Financials
-  /financials/{symbol}/rd-expenses:
-    get:
-      description: Récupère les dépenses en recherche et développement pour une entreprise
-        donnée sur les 10 dernières années.
+      - Data Collection
+  /api/v1/screening:
+    post:
+      consumes:
+      - application/json
+      description: Filter companies based on valuation, profitability, and financial
+        health criteria
       parameters:
-      - description: Symbol de l'entreprise
-        in: path
-        name: symbol
+      - description: Screening criteria
+        in: body
+        name: criteria
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/services.ScreeningCriteria'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/pkg.RDExpensesResponse'
+            $ref: '#/definitions/pkg.ScreeningResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Get R&D Expenses Data
+      summary: Screen companies based on fundamental criteria
       tags:
-      - Financials
+      - Screening
+  /api/v1/screening/templates:
+    get:
+      consumes:
+      - application/json
+      description: Get predefined screening templates for common investment strategies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/pkg.ScreeningTemplatesResponse'
+      summary: Get screening templates
+      tags:
+      - Screening
 swagger: "2.0"

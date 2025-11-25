@@ -12,6 +12,10 @@ services:
 
   sqitch:
     image: sqitch/sqitch:v1.5
+    environment:
+      DB_USER: rthomas
+      DB_PASSWORD: rthomas
+      DB_NAME: qualitinvest_db
     depends_on:
       - db
     volumes:

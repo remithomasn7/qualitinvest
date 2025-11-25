@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/remithomasn7/qualitinvest/internal/models"
@@ -64,6 +65,12 @@ func (c *AlphaVantageClient) CompanyOverview(symbol string) (*models.CompanyOver
 	if err != nil {
 		return nil, err
 	}
+
+	// Vérifier si la réponse contient un message d'erreur/demo
+	if strings.Contains(string(body), "Information") && strings.Contains(string(body), "demo") {
+		return nil, fmt.Errorf("demo API key used - please use a valid API key")
+	}
+
 	err = json.Unmarshal(body, overview)
 	if err != nil {
 		return nil, err

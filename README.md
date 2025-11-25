@@ -23,3 +23,4 @@ go run cmd/main.go
 # RESSOURCES
 
 https://www.freecodecamp.org/news/how-to-build-historical-price-charts-with-d3-js-72214aaf6ba3/
+https://perso.univ-lemans.fr/~cpiau/BD/SQL_PAGES/SQL0.html

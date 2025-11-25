@@ -4,3 +4,5 @@
 
 qualitinvestschema  2025-04-23T20:38:48Z rthomas,,, <rthomas@rthomas-BOHK-WAX9X> # Add schema for all qualitinvest objects.
 create_appuser      2025-10-04T22:44:00Z rthomas,,, <rthomas@rthomas-BOHK-WAX9X> # Create application user
+create_core_tables  2025-10-18T22:46:00Z rthomas,,, <rthomas@rthomas-BOHK-WAX9X> # Create comprehensive core tables for value investing
+create_ratios_table 2025-10-18T22:56:00Z rthomas,,, <rthomas@rthomas-BOHK-WAX9X> # Create calculated financial ratios tables

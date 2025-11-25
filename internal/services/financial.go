@@ -1,32 +1,91 @@
 package services
 
 import (
+	"database/sql"
 	"log"
 	"time"
 
 	"github.com/patrickmn/go-cache"
 	"github.com/remithomasn7/qualitinvest/internal/alpha_vantage"
 	"github.com/remithomasn7/qualitinvest/internal/models"
+	"github.com/remithomasn7/qualitinvest/internal/repository"
 )
 
 // Initialisation du cache avec une expiration de 24h et un nettoyage toutes les heures
 var financialCache = cache.New(24*time.Hour, 1*time.Hour)
 
-func FetchCompanyOverview(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.CompanyOverview, error) {
+type FinancialService struct {
+	apiClient     *alpha_vantage.AlphaVantageClient
+	companyRepo   repository.CompanyRepository
+	overviewRepo  repository.CompanyOverviewRepository
+	incomeRepo    repository.IncomeRepository
+	balanceRepo   repository.BalanceRepository
+	cashFlowRepo  repository.CashFlowRepository
+	dividendsRepo repository.DividendsRepository
+	splitsRepo    repository.SplitsRepository
+	sharesRepo    repository.SharesOutstandingRepository
+	earningsRepo  repository.EarningsRepository
+}
+
+func NewFinancialService(db *sql.DB, apiClient *alpha_vantage.AlphaVantageClient) *FinancialService {
+	return &FinancialService{
+		apiClient:     apiClient,
+		companyRepo:   repository.NewCompanyRepository(db),
+		overviewRepo:  repository.NewCompanyOverviewRepository(db),
+		incomeRepo:    repository.NewIncomeRepository(db),
+		balanceRepo:   repository.NewBalanceRepository(db),
+		cashFlowRepo:  repository.NewCashFlowRepository(db),
+		dividendsRepo: repository.NewDividendsRepository(db),
+		splitsRepo:    repository.NewSplitsRepository(db),
+		sharesRepo:    repository.NewSharesOutstandingRepository(db),
+		earningsRepo:  repository.NewEarningsRepository(db),
+	}
+}
+
+func (s *FinancialService) FetchCompanyOverview(symbol string) (models.CompanyOverview, error) {
 	// Check if data are in cache
-	if cachedData, found := financialCache.Get("overview_" + symbol); found {
-		log.Printf("Overview data successfuly found in cache for: %s", symbol)
+	cacheKey := "overview_" + symbol
+	if cachedData, found := financialCache.Get(cacheKey); found {
+		log.Printf("Overview data successfully found in cache for: %s", symbol)
 		return cachedData.(models.CompanyOverview), nil
 	}
 
-	// If data are not in cache, call AlphaVantage API
-	overviewData, err := apiClient.CompanyOverview(symbol)
+	// Try to get from database first
+	if dbData, err := s.overviewRepo.GetBySymbol(symbol); err == nil && dbData != nil {
+		log.Printf("Overview data successfully found in database for: %s", symbol)
+		financialCache.Set(cacheKey, *dbData, cache.DefaultExpiration)
+		return *dbData, nil
+	}
+
+	// If not in database, call AlphaVantage API
+	overviewData, err := s.apiClient.CompanyOverview(symbol)
 	if err != nil {
 		return models.CompanyOverview{}, err
 	}
 
-	// Store/Update data in cache
-	financialCache.Set("overview_"+symbol, *overviewData, cache.DefaultExpiration)
+	// Create or update company record
+	_, err = s.companyRepo.CreateOrUpdate(
+		overviewData.Symbol,
+		overviewData.Name,
+		overviewData.Exchange,
+		overviewData.Sector,
+		overviewData.Industry,
+		overviewData.Country,
+		overviewData.Currency,
+	)
+	if err != nil {
+		log.Printf("Warning: Failed to save company info for %s: %v", symbol, err)
+	}
+
+	// Persist overview data to database
+	err = s.overviewRepo.Save(*overviewData)
+	if err != nil {
+		log.Printf("Warning: Failed to persist overview data for %s: %v", symbol, err)
+		// Continue anyway - we can still return the data
+	}
+
+	// Store in cache
+	financialCache.Set(cacheKey, *overviewData, cache.DefaultExpiration)
 
 	return *overviewData, nil
 }
