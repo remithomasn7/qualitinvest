@@ -1,25 +1,30 @@
 package controllers
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/remithomasn7/qualitinvest/internal/services"
 	"github.com/remithomasn7/qualitinvest/pkg"
+	"go.opentelemetry.io/otel/log"
 )
 
 // ScreeningController gère les endpoints de screening
 type ScreeningController struct {
-	screeningService     *services.ScreeningService
+	logger                *pkg.Logger
+	screeningService      *services.ScreeningService
 	dataCollectionService *services.DataCollectionService
 }
 
 // NewScreeningController crée un nouveau contrôleur de screening
-func NewScreeningController(screeningSvc *services.ScreeningService, dataSvc *services.DataCollectionService) *ScreeningController {
+func NewScreeningController(screeningSvc *services.ScreeningService, dataSvc *services.DataCollectionService, logger *pkg.Logger) *ScreeningController {
 	return &ScreeningController{
-		screeningService:     screeningSvc,
+		logger:                logger,
+		screeningService:      screeningSvc,
 		dataCollectionService: dataSvc,
 	}
 }
@@ -73,12 +78,27 @@ func (sc *ScreeningController) ScreenCompanies(c *gin.Context) {
 // @Failure 500 {object} pkg.ErrorResponse
 // @Router /api/v1/analysis/{symbol} [get]
 func (sc *ScreeningController) GetCompanyAnalysis(c *gin.Context) {
+	ctx := context.Background()
+	startTime := time.Now()
 	symbol := c.Param("symbol")
 
+	sc.logger.Info(ctx, "📥 Requête d'analyse d'entreprise reçue",
+		log.String("symbol", symbol),
+		log.String("endpoint", "/api/v1/analysis/"+symbol),
+		log.String("method", "GET"))
+
 	// Vérifier si les données existent
+	sc.logger.Debug(ctx, "🔍 Vérification de la disponibilité des données",
+		log.String("symbol", symbol))
+
 	stale, err := sc.dataCollectionService.IsDataStale(symbol, 0)
 	if err != nil {
 		// Erreur technique lors de la vérification
+		sc.logger.Error(ctx, "❌ Erreur lors de la vérification des données",
+			log.String("symbol", symbol),
+			log.String("error", err.Error()),
+			log.Float64("duration_ms", float64(time.Since(startTime).Milliseconds())))
+
 		c.JSON(http.StatusInternalServerError, pkg.ErrorResponse{
 			Status:  "error",
 			Message: "Failed to check data availability: " + err.Error(),
@@ -89,6 +109,10 @@ func (sc *ScreeningController) GetCompanyAnalysis(c *gin.Context) {
 
 	if stale {
 		// Les données n'existent pas ou sont trop vieilles
+		sc.logger.Warn(ctx, "⚠️ Données non disponibles - redirection vers collecte",
+			log.String("symbol", symbol),
+			log.Float64("duration_ms", float64(time.Since(startTime).Milliseconds())))
+
 		c.JSON(http.StatusNotFound, pkg.ErrorResponse{
 			Status:  "error",
 			Message: fmt.Sprintf("No data available for symbol %s. Please collect data first using POST /api/v1/collect/%s", symbol, symbol),
@@ -97,9 +121,17 @@ func (sc *ScreeningController) GetCompanyAnalysis(c *gin.Context) {
 		return
 	}
 
+	sc.logger.Debug(ctx, "✅ Données disponibles, récupération de l'analyse",
+		log.String("symbol", symbol))
+
 	// Les données existent, récupérer l'analyse
 	analysis, err := sc.screeningService.GetCompanyAnalysis(symbol)
 	if err != nil {
+		sc.logger.Error(ctx, "❌ Erreur lors de la récupération de l'analyse",
+			log.String("symbol", symbol),
+			log.String("error", err.Error()),
+			log.Float64("duration_ms", float64(time.Since(startTime).Milliseconds())))
+
 		c.JSON(http.StatusInternalServerError, pkg.ErrorResponse{
 			Status:  "error",
 			Message: "Failed to retrieve company analysis: " + err.Error(),
@@ -107,6 +139,13 @@ func (sc *ScreeningController) GetCompanyAnalysis(c *gin.Context) {
 		})
 		return
 	}
+
+	duration := time.Since(startTime)
+	sc.logger.Info(ctx, "✅ Analyse d'entreprise terminée avec succès",
+		log.String("symbol", symbol),
+		log.Float64("duration_ms", float64(duration.Milliseconds())),
+		log.String("company_name", analysis.Overview.Name),
+		log.String("sector", analysis.Overview.Sector))
 
 	c.JSON(http.StatusOK, pkg.CompanyAnalysisResponse{
 		Status: "success",
@@ -235,11 +274,11 @@ func (sc *ScreeningController) GetScreeningTemplates(c *gin.Context) {
 			Name:        "Quality Investing",
 			Description: "High quality, stable companies",
 			Criteria: services.ScreeningCriteria{
-				MinProfitMargin:  floatPtr(0.10),
-				MinROE:           floatPtr(0.15),
-				MaxDebtToEquity:   floatPtr(0.5),
-				MinCurrentRatio:   floatPtr(1.5),
-				Limit:             100,
+				MinProfitMargin: floatPtr(0.10),
+				MinROE:          floatPtr(0.15),
+				MaxDebtToEquity: floatPtr(0.5),
+				MinCurrentRatio: floatPtr(1.5),
+				Limit:           100,
 			},
 		},
 	}

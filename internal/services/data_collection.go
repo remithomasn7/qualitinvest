@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
@@ -9,10 +10,13 @@ import (
 
 	"github.com/remithomasn7/qualitinvest/internal/alpha_vantage"
 	"github.com/remithomasn7/qualitinvest/internal/repository"
+	"github.com/remithomasn7/qualitinvest/pkg"
+	otelog "go.opentelemetry.io/otel/log"
 )
 
 // DataCollectionService gère la collecte intelligente des données
 type DataCollectionService struct {
+	logger       *pkg.Logger
 	apiClient    *alpha_vantage.AlphaVantageClient
 	companyRepo  repository.CompanyRepository
 	overviewRepo repository.CompanyOverviewRepository
@@ -23,8 +27,9 @@ type DataCollectionService struct {
 }
 
 // NewDataCollectionService crée un nouveau service de collecte
-func NewDataCollectionService(db *sql.DB, apiClient *alpha_vantage.AlphaVantageClient) *DataCollectionService {
+func NewDataCollectionService(db *sql.DB, apiClient *alpha_vantage.AlphaVantageClient, logger *pkg.Logger) *DataCollectionService {
 	return &DataCollectionService{
+		logger:       logger,
 		apiClient:    apiClient,
 		companyRepo:  repository.NewCompanyRepository(db),
 		overviewRepo: repository.NewCompanyOverviewRepository(db),
@@ -38,14 +43,26 @@ func NewDataCollectionService(db *sql.DB, apiClient *alpha_vantage.AlphaVantageC
 // CollectCompanyData collecte toutes les données d'une entreprise depuis Alpha Vantage
 // Utilisé pour les nouvelles entreprises ou mises à jour complètes
 func (s *DataCollectionService) CollectCompanyData(symbol string) error {
-	log.Printf("Starting data collection for %s", symbol)
+	ctx := context.Background()
+
+	s.logger.Info(ctx, "🚀 Début de la collecte de données depuis Alpha Vantage",
+		otelog.String("symbol", symbol))
 
 	// 1. Collecter les données overview (métadonnées + ratios)
+	s.logger.Debug(ctx, "📡 Appel API Alpha Vantage - Company Overview",
+		otelog.String("symbol", symbol))
+
 	overview, err := s.apiClient.CompanyOverview(symbol)
 	if err != nil {
-		log.Printf("Failed to fetch overview for %s: %v", symbol, err)
+		s.logger.Error(ctx, "❌ Échec de récupération des données overview depuis Alpha Vantage",
+			otelog.String("symbol", symbol),
+			otelog.String("error", err.Error()))
 		return fmt.Errorf("failed to fetch company overview: %w", err)
 	}
+
+	s.logger.Info(ctx, "✅ Données overview récupérées avec succès",
+		otelog.String("symbol", symbol),
+		otelog.String("company_name", overview.Name))
 
 	// 2. Valider que les données sont valides
 	// Alpha Vantage peut retourner des données vides pour les symboles invalides
@@ -146,14 +163,29 @@ func (s *DataCollectionService) BatchUpdateOverviews() error {
 
 // IsDataStale vérifie si les données d'une entreprise sont obsolètes
 func (s *DataCollectionService) IsDataStale(symbol string, maxAge time.Duration) (bool, error) {
+	ctx := context.Background()
+
+	s.logger.Debug(ctx, "🔍 Vérification de la fraîcheur des données",
+		otelog.String("symbol", symbol),
+		otelog.Float64("max_age_seconds", maxAge.Seconds()))
+
 	overview, err := s.overviewRepo.GetBySymbol(symbol)
 	if err != nil {
+		s.logger.Warn(ctx, "⚠️ Erreur lors de la vérification des données en cache",
+			otelog.String("symbol", symbol),
+			otelog.String("error", err.Error()))
 		return true, err // Si pas de données, c'est stale
 	}
 
 	if overview == nil {
+		s.logger.Info(ctx, "📭 Aucune donnée trouvée en cache - données manquantes",
+			otelog.String("symbol", symbol))
 		return true, nil // Pas de données
 	}
+
+	s.logger.Info(ctx, "✅ Données trouvées en cache - données disponibles",
+		otelog.String("symbol", symbol),
+		otelog.String("latest_quarter", overview.LatestQuarter))
 
 	// Pour l'instant, on considère comme stale si plus vieux que maxAge
 	// TODO: Implémenter une vraie logique de vérification de fraîcheur

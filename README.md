@@ -2,7 +2,22 @@
 my quality investing journey
 
 # WORKING WITH THE PROJECT
-This section gives advices on how to run this project Python Flask project
+This section gives advices on how to run this project Go API project with OpenTelemetry logging
+
+# OpenTelemetry Logging
+This project uses OpenTelemetry for structured logging. Logs are exported to console by default.
+
+## Configuration
+Copy `env.example` to `.env` and configure your environment variables:
+
+```bash
+cp env.example .env
+```
+
+Available OpenTelemetry environment variables:
+- `OTEL_SERVICE_NAME`: Service name (default: qualitinvest-api)
+- `OTEL_SERVICE_VERSION`: Service version (default: 1.0.0)
+- `OTEL_LOGS_EXPORTER`: Log exporter (default: console)
 
 # Swagger
 To generate the swagger files please run the following command

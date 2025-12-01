@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -13,19 +14,65 @@ import (
 	"github.com/remithomasn7/qualitinvest/internal/config"
 	"github.com/remithomasn7/qualitinvest/internal/controllers"
 	"github.com/remithomasn7/qualitinvest/internal/services"
+	"github.com/remithomasn7/qualitinvest/pkg"
 
 	_ "github.com/remithomasn7/qualitinvest/docs" // Import indirect pour Swagger
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files" // swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger"
+
+	otelog "go.opentelemetry.io/otel/log"
 )
+
+// otelWriter implémente io.Writer pour rediriger les logs Gin vers OpenTelemetry
+type otelWriter struct {
+	ctx    context.Context
+	logger *pkg.Logger
+}
+
+func (w *otelWriter) Write(p []byte) (n int, err error) {
+	message := strings.TrimSpace(string(p))
+
+	if strings.Contains(message, "ERROR") || strings.Contains(message, "PANIC") {
+		w.logger.Error(w.ctx, message, otelog.String("source", "gin"))
+	} else {
+		w.logger.Info(w.ctx, message, otelog.String("source", "gin"))
+	}
+
+	return len(p), nil
+}
 
 // @title My Investment API
 // @version 1.0
 // @description API for analyzing company financials based on Alpha Vantage data.
 // @BasePath /
 func main() {
+	// Initialiser le contexte global
+	ctx := context.Background()
+
+	// Initialiser OpenTelemetry logging
+	otelShutdown, err := config.InitOpenTelemetryLogger(ctx)
+	if err != nil {
+		log.Fatalf("Failed to initialize OpenTelemetry logger: %v", err)
+	}
+	defer otelShutdown()
+
+	// Créer le logger OpenTelemetry
+	appLogger := pkg.NewLogger("qualitinvest-api")
+
+	// Configurer Gin pour utiliser OpenTelemetry logging en production
+	if os.Getenv("ENV") == "production" {
+		gin.DefaultWriter = &otelWriter{ctx: ctx, logger: appLogger}
+		gin.DefaultErrorWriter = &otelWriter{ctx: ctx, logger: appLogger}
+	}
+
+	// Configurer Gin pour utiliser OpenTelemetry logging en production
+	if os.Getenv("ENV") == "production" {
+		gin.DefaultWriter = &otelWriter{ctx: ctx, logger: appLogger}
+		gin.DefaultErrorWriter = &otelWriter{ctx: ctx, logger: appLogger}
+	}
+
 	router := gin.Default()
 
 	router.SetTrustedProxies(nil)
@@ -41,15 +88,15 @@ func main() {
 	apiClient := alpha_vantage.NewClient()
 
 	// Initialize services
-	dataCollectionService := services.NewDataCollectionService(db, apiClient)
-	screeningService := services.NewScreeningService(db)
+	dataCollectionService := services.NewDataCollectionService(db, apiClient, appLogger)
+	screeningService := services.NewScreeningService(db, appLogger)
 	scheduler := services.NewDataScheduler(dataCollectionService)
 
 	// Start the data collection scheduler
 	scheduler.Start()
 
 	// Initialize controllers
-	screeningController := controllers.NewScreeningController(screeningService, dataCollectionService)
+	screeningController := controllers.NewScreeningController(screeningService, dataCollectionService, appLogger)
 
 	// ============================
 	// NOUVEAUX ENDPOINTS DE SCREENING ET ANALYSE
@@ -79,11 +126,15 @@ func main() {
 	// Route pour la documentation Swagger
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	log.Println("🚀 Stock Screener API starting on :8080")
-	log.Println("📊 Database connected and services initialized")
-	log.Println("📈 Data collection scheduler started")
-	log.Println("🎯 New screening endpoints available at /api/v1/screening")
-	log.Println("📋 Company analysis available at /api/v1/analysis/{symbol}")
+	appLogger.Info(ctx, "🚀 Stock Screener API starting on :8080",
+		otelog.String("port", ":8080"),
+		otelog.String("version", "1.0.0"))
+	appLogger.Info(ctx, "📊 Database connected and services initialized")
+	appLogger.Info(ctx, "📈 Data collection scheduler started")
+	appLogger.Info(ctx, "🎯 New screening endpoints available",
+		otelog.String("screening_endpoint", "/api/v1/screening"))
+	appLogger.Info(ctx, "📋 Company analysis available",
+		otelog.String("analysis_endpoint", "/api/v1/analysis/{symbol}"))
 
 	// Configuration du serveur avec gestion d'arrêt propre
 	srv := &http.Server{
@@ -103,25 +154,26 @@ func main() {
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
-	log.Println("🛑 Shutdown signal received, stopping gracefully...")
+	appLogger.Info(ctx, "🛑 Shutdown signal received, stopping gracefully...")
 
 	// Arrêt propre du scheduler
-	log.Println("⏹️ Stopping data collection scheduler...")
+	appLogger.Info(ctx, "⏹️ Stopping data collection scheduler...")
 	scheduler.Stop()
 
 	// Fermeture de la base de données
-	log.Println("💾 Closing database connections...")
+	appLogger.Info(ctx, "💾 Closing database connections...")
 	db.Close()
 
 	// Arrêt du serveur HTTP avec timeout
-	log.Println("🌐 Shutting down HTTP server...")
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	appLogger.Info(ctx, "🌐 Shutting down HTTP server...")
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	if err := srv.Shutdown(ctx); err != nil {
-		log.Printf("❌ Server forced to shutdown: %v", err)
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		appLogger.Error(ctx, "❌ Server forced to shutdown",
+			otelog.String("error", err.Error()))
 		os.Exit(1)
 	}
 
-	log.Println("✅ Application stopped gracefully")
+	appLogger.Info(ctx, "✅ Application stopped gracefully")
 }

@@ -1,11 +1,14 @@
 package services
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 
 	"github.com/remithomasn7/qualitinvest/internal/models"
 	"github.com/remithomasn7/qualitinvest/internal/repository"
+	"github.com/remithomasn7/qualitinvest/pkg"
+	"go.opentelemetry.io/otel/log"
 )
 
 // ScreeningCriteria définit les critères de filtrage pour le screening
@@ -18,8 +21,8 @@ type ScreeningCriteria struct {
 	MinPriceToSales *float64 `json:"min_price_to_sales"`
 
 	// Profitability
-	MinROE         *float64 `json:"min_roe"`
-	MinROA         *float64 `json:"min_roa"`
+	MinROE          *float64 `json:"min_roe"`
+	MinROA          *float64 `json:"min_roa"`
 	MinProfitMargin *float64 `json:"min_profit_margin"`
 
 	// Financial health
@@ -43,6 +46,7 @@ type ScreeningCriteria struct {
 
 // ScreeningService gère les opérations de screening et d'analyse
 type ScreeningService struct {
+	logger       *pkg.Logger
 	overviewRepo repository.CompanyOverviewRepository
 	companyRepo  repository.CompanyRepository
 	incomeRepo   repository.IncomeRepository
@@ -51,8 +55,9 @@ type ScreeningService struct {
 }
 
 // NewScreeningService crée un nouveau service de screening
-func NewScreeningService(db *sql.DB) *ScreeningService {
+func NewScreeningService(db *sql.DB, logger *pkg.Logger) *ScreeningService {
 	return &ScreeningService{
+		logger:       logger,
 		overviewRepo: repository.NewCompanyOverviewRepository(db),
 		companyRepo:  repository.NewCompanyRepository(db),
 		incomeRepo:   repository.NewIncomeRepository(db),
@@ -144,23 +149,48 @@ func (s *ScreeningService) ScreenCompanies(criteria ScreeningCriteria) ([]models
 
 // GetCompanyAnalysis retourne une analyse complète d'une entreprise
 func (s *ScreeningService) GetCompanyAnalysis(symbol string) (*models.CompanyAnalysis, error) {
+	ctx := context.Background()
+
+	s.logger.Info(ctx, "📊 Début de l'analyse de l'entreprise",
+		log.String("symbol", symbol))
+
 	// Récupérer l'overview
+	s.logger.Debug(ctx, "🗃️ Récupération des données overview depuis la base de données",
+		log.String("symbol", symbol))
+
 	overview, err := s.overviewRepo.GetBySymbol(symbol)
 	if err != nil {
+		s.logger.Error(ctx, "❌ Erreur lors de la récupération des données overview",
+			log.String("symbol", symbol),
+			log.String("error", err.Error()))
 		return nil, err
 	}
 	if overview == nil {
+		s.logger.Warn(ctx, "⚠️ Aucune donnée overview trouvée pour l'entreprise",
+			log.String("symbol", symbol))
 		return nil, fmt.Errorf("company not found: %s", symbol)
 	}
 
 	// Récupérer la compagnie
+	s.logger.Debug(ctx, "🗃️ Récupération des informations de l'entreprise",
+		log.String("symbol", symbol))
+
 	company, err := s.companyRepo.GetBySymbol(symbol)
 	if err != nil {
+		s.logger.Error(ctx, "❌ Erreur lors de la récupération des informations de l'entreprise",
+			log.String("symbol", symbol),
+			log.String("error", err.Error()))
 		return nil, err
 	}
 	if company == nil {
+		s.logger.Warn(ctx, "⚠️ Aucune information d'entreprise trouvée",
+			log.String("symbol", symbol))
 		return nil, fmt.Errorf("company not found: %s", symbol)
 	}
+
+	s.logger.Info(ctx, "✅ Données récupérées avec succès, construction de l'analyse",
+		log.String("symbol", symbol),
+		log.String("company_name", overview.Name))
 
 	// Construire l'analyse
 	analysis := &models.CompanyAnalysis{
