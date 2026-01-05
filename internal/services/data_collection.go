@@ -46,7 +46,8 @@ func (s *DataCollectionService) CollectCompanyData(symbol string) error {
 	ctx := context.Background()
 
 	s.logger.Info(ctx, "🚀 Début de la collecte de données depuis Alpha Vantage",
-		otelog.String("symbol", symbol))
+		otelog.String("symbol", symbol),
+		otelog.String("source", "manual_or_auto"))
 
 	// 1. Collecter les données overview (métadonnées + ratios)
 	s.logger.Debug(ctx, "📡 Appel API Alpha Vantage - Company Overview",
@@ -171,19 +172,19 @@ func (s *DataCollectionService) IsDataStale(symbol string, maxAge time.Duration)
 
 	overview, err := s.overviewRepo.GetBySymbol(symbol)
 	if err != nil {
-		s.logger.Warn(ctx, "⚠️ Erreur lors de la vérification des données en cache",
+		s.logger.Warn(ctx, "⚠️ Erreur lors de la vérification des données en base de données",
 			otelog.String("symbol", symbol),
 			otelog.String("error", err.Error()))
 		return true, err // Si pas de données, c'est stale
 	}
 
 	if overview == nil {
-		s.logger.Info(ctx, "📭 Aucune donnée trouvée en cache - données manquantes",
+		s.logger.Info(ctx, "📭 Aucune donnée trouvée en base de données - données manquantes",
 			otelog.String("symbol", symbol))
 		return true, nil // Pas de données
 	}
 
-	s.logger.Info(ctx, "✅ Données trouvées en cache - données disponibles",
+	s.logger.Info(ctx, "✅ Données trouvées en base de données - données disponibles",
 		otelog.String("symbol", symbol),
 		otelog.String("latest_quarter", overview.LatestQuarter))
 

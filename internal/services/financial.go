@@ -3,16 +3,11 @@ package services
 import (
 	"database/sql"
 	"log"
-	"time"
 
-	"github.com/patrickmn/go-cache"
 	"github.com/remithomasn7/qualitinvest/internal/alpha_vantage"
 	"github.com/remithomasn7/qualitinvest/internal/models"
 	"github.com/remithomasn7/qualitinvest/internal/repository"
 )
-
-// Initialisation du cache avec une expiration de 24h et un nettoyage toutes les heures
-var financialCache = cache.New(24*time.Hour, 1*time.Hour)
 
 type FinancialService struct {
 	apiClient     *alpha_vantage.AlphaVantageClient
@@ -43,23 +38,17 @@ func NewFinancialService(db *sql.DB, apiClient *alpha_vantage.AlphaVantageClient
 }
 
 func (s *FinancialService) FetchCompanyOverview(symbol string) (models.CompanyOverview, error) {
-	// Check if data are in cache
-	cacheKey := "overview_" + symbol
-	if cachedData, found := financialCache.Get(cacheKey); found {
-		log.Printf("Overview data successfully found in cache for: %s", symbol)
-		return cachedData.(models.CompanyOverview), nil
-	}
-
 	// Try to get from database first
 	if dbData, err := s.overviewRepo.GetBySymbol(symbol); err == nil && dbData != nil {
 		log.Printf("Overview data successfully found in database for: %s", symbol)
-		financialCache.Set(cacheKey, *dbData, cache.DefaultExpiration)
 		return *dbData, nil
 	}
 
 	// If not in database, call AlphaVantage API
+	log.Printf("Overview data not found in database for %s, calling AlphaVantage API", symbol)
 	overviewData, err := s.apiClient.CompanyOverview(symbol)
 	if err != nil {
+		log.Printf("Failed to fetch overview from AlphaVantage API for %s: %v", symbol, err)
 		return models.CompanyOverview{}, err
 	}
 
@@ -84,160 +73,102 @@ func (s *FinancialService) FetchCompanyOverview(symbol string) (models.CompanyOv
 		// Continue anyway - we can still return the data
 	}
 
-	// Store in cache
-	financialCache.Set(cacheKey, *overviewData, cache.DefaultExpiration)
-
+	log.Printf("Overview data saved to database for: %s", symbol)
 	return *overviewData, nil
 }
 
 func FetchETFProfile(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.ETFProfile, error) {
-	// Vérifie si les données sont en cache
-	if cachedData, found := financialCache.Get("etfprofile_" + symbol); found {
-		log.Printf("ETF Profile data found in cache for: %s", symbol)
-		return cachedData.(models.ETFProfile), nil
-	}
-
-	// Si non, appelle l'API AlphaVantage
+	log.Printf("Fetching ETF Profile from AlphaVantage API for: %s", symbol)
 	etfProfileData, err := apiClient.ETFProfile(symbol)
 	if err != nil {
+		log.Printf("Failed to fetch ETF Profile from AlphaVantage API for %s: %v", symbol, err)
 		return models.ETFProfile{}, err
 	}
 
-	// Stocke les données en cache
-	financialCache.Set("etfprofile_"+symbol, *etfProfileData, cache.DefaultExpiration)
-
+	log.Printf("ETF Profile data successfully fetched for: %s", symbol)
 	return *etfProfileData, nil
 }
 
 func FetchDividends(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.Dividends, error) {
-	// Check if data are in cache
-	if cachedData, found := financialCache.Get("dividends_" + symbol); found {
-		log.Printf("Dividends data found in cache for: %s", symbol)
-		return cachedData.(models.Dividends), nil
-	}
-
-	// If data are not in cache, call AlphaVantage API
+	log.Printf("Fetching Dividends from AlphaVantage API for: %s", symbol)
 	dividendsData, err := apiClient.Dividends(symbol)
 	if err != nil {
+		log.Printf("Failed to fetch Dividends from AlphaVantage API for %s: %v", symbol, err)
 		return models.Dividends{}, err
 	}
 
-	// Store/Update data in cache
-	financialCache.Set("dividends_"+symbol, *dividendsData, cache.DefaultExpiration)
-
+	log.Printf("Dividends data successfully fetched for: %s", symbol)
 	return *dividendsData, nil
 }
 
 func FetchSplits(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.Splits, error) {
-	// Check if data are in cache
-	if cachedData, found := financialCache.Get("splits_" + symbol); found {
-		log.Printf("Splits data found in cache for: %s", symbol)
-		return cachedData.(models.Splits), nil
-	}
-
-	// If data are not in cache, call AlphaVantage API
+	log.Printf("Fetching Splits from AlphaVantage API for: %s", symbol)
 	splitsData, err := apiClient.Splits(symbol)
 	if err != nil {
+		log.Printf("Failed to fetch Splits from AlphaVantage API for %s: %v", symbol, err)
 		return models.Splits{}, err
 	}
 
-	// Store/Update data in cache
-	financialCache.Set("splits_"+symbol, *splitsData, cache.DefaultExpiration)
-
+	log.Printf("Splits data successfully fetched for: %s", symbol)
 	return *splitsData, nil
 }
 
 func FetchIncomeStatements(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.IncomeStatements, error) {
-	// Check if data are in cache
-	if cachedData, found := financialCache.Get("income_" + symbol); found {
-		log.Printf("Income Statements data successfuly found in cache for: %s", symbol)
-		return cachedData.(models.IncomeStatements), nil
-	}
-
-	// If data are not in cache, call AlphaVantage API
+	log.Printf("Fetching Income Statements from AlphaVantage API for: %s", symbol)
 	incomeData, err := apiClient.IncomeStatements(symbol)
 	if err != nil {
+		log.Printf("Failed to fetch Income Statements from AlphaVantage API for %s: %v", symbol, err)
 		return models.IncomeStatements{}, err
 	}
 
-	// Store/Update data in cache
-	financialCache.Set("income_"+symbol, *incomeData, cache.DefaultExpiration)
-
+	log.Printf("Income Statements data successfully fetched for: %s", symbol)
 	return *incomeData, nil
 }
 
 func FetchBalanceSheet(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.BalanceSheet, error) {
-	// Check if data are in cache
-	if cachedData, found := financialCache.Get("balancesheet_" + symbol); found {
-		log.Printf("Balance Sheet data successfuly found in cache for: %s", symbol)
-		return cachedData.(models.BalanceSheet), nil
-	}
-
-	// If data are not in cache, call AlphaVantage API
+	log.Printf("Fetching Balance Sheet from AlphaVantage API for: %s", symbol)
 	balanceSheetData, err := apiClient.BalanceSheet(symbol)
 	if err != nil {
+		log.Printf("Failed to fetch Balance Sheet from AlphaVantage API for %s: %v", symbol, err)
 		return models.BalanceSheet{}, err
 	}
 
-	// Store/Update data in cache
-	financialCache.Set("balancesheet_"+symbol, *balanceSheetData, cache.DefaultExpiration)
-
+	log.Printf("Balance Sheet data successfully fetched for: %s", symbol)
 	return *balanceSheetData, nil
 }
 
 func FetchCashFlowStatements(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.CashFlowStatements, error) {
-	// Check if data are in cache
-	if cachedData, found := financialCache.Get("cashflow_" + symbol); found {
-		log.Printf("Cash Flow Statements successfuly found in cache for: %s", symbol)
-		return cachedData.(models.CashFlowStatements), nil
-	}
-
-	// If data are not in cache, call AlphaVantage API
+	log.Printf("Fetching Cash Flow Statements from AlphaVantage API for: %s", symbol)
 	cashFlowData, err := apiClient.CashFlowStatements(symbol)
 	if err != nil {
+		log.Printf("Failed to fetch Cash Flow Statements from AlphaVantage API for %s: %v", symbol, err)
 		return models.CashFlowStatements{}, err
 	}
 
-	// Store/Update data in cache
-	financialCache.Set("cashflow_"+symbol, *cashFlowData, cache.DefaultExpiration)
-
+	log.Printf("Cash Flow Statements data successfully fetched for: %s", symbol)
 	return *cashFlowData, nil
 }
 
 func FetchSharesOutstandings(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.SharesOutstandings, error) {
-	// Check if data are in cache
-	if cachedData, found := financialCache.Get("shares_outstandings_" + symbol); found {
-		log.Printf("Shares Outstanding data successfuly found in cache for: %s", symbol)
-		return cachedData.(models.SharesOutstandings), nil
-	}
-
-	// If data are not in cache, call AlphaVantage API
+	log.Printf("Fetching Shares Outstanding from AlphaVantage API for: %s", symbol)
 	sharesOutstandingsData, err := apiClient.SharesOutstandings(symbol)
 	if err != nil {
+		log.Printf("Failed to fetch Shares Outstanding from AlphaVantage API for %s: %v", symbol, err)
 		return models.SharesOutstandings{}, err
 	}
 
-	// Store/Update data in cache
-	financialCache.Set("shares_outstandings_"+symbol, *sharesOutstandingsData, cache.DefaultExpiration)
-
+	log.Printf("Shares Outstanding data successfully fetched for: %s", symbol)
 	return *sharesOutstandingsData, nil
 }
 
 func FetchEarnings(apiClient *alpha_vantage.AlphaVantageClient, symbol string) (models.Earnings, error) {
-	// Check if data are in cache
-	if cachedData, found := financialCache.Get("earnings_" + symbol); found {
-		log.Printf("Earnings data successfuly found in cache for: %s", symbol)
-		return cachedData.(models.Earnings), nil
-	}
-
-	// If data are not in cache, call AlphaVantage API
+	log.Printf("Fetching Earnings from AlphaVantage API for: %s", symbol)
 	earningsData, err := apiClient.Earnings(symbol)
 	if err != nil {
+		log.Printf("Failed to fetch Earnings from AlphaVantage API for %s: %v", symbol, err)
 		return models.Earnings{}, err
 	}
 
-	// Store/Update data in cache
-	financialCache.Set("earnings_"+symbol, *earningsData, cache.DefaultExpiration)
-
+	log.Printf("Earnings data successfully fetched for: %s", symbol)
 	return *earningsData, nil
 }

@@ -68,13 +68,13 @@ func (sc *ScreeningController) ScreenCompanies(c *gin.Context) {
 }
 
 // @Summary Get detailed company analysis
-// @Description Get comprehensive fundamental analysis for a specific company
+// @Description Get comprehensive fundamental analysis for a specific company. Data collection is automatic if not available.
 // @Tags Analysis
 // @Accept json
 // @Produce json
 // @Param symbol path string true "Company Symbol"
 // @Success 200 {object} pkg.CompanyAnalysisResponse
-// @Failure 404 {object} pkg.ErrorResponse
+// @Failure 400 {object} pkg.ErrorResponse
 // @Failure 500 {object} pkg.ErrorResponse
 // @Router /api/v1/analysis/{symbol} [get]
 func (sc *ScreeningController) GetCompanyAnalysis(c *gin.Context) {
@@ -108,17 +108,40 @@ func (sc *ScreeningController) GetCompanyAnalysis(c *gin.Context) {
 	}
 
 	if stale {
-		// Les données n'existent pas ou sont trop vieilles
-		sc.logger.Warn(ctx, "⚠️ Données non disponibles - redirection vers collecte",
-			log.String("symbol", symbol),
-			log.Float64("duration_ms", float64(time.Since(startTime).Milliseconds())))
+		// Les données n'existent pas - collecte automatique
+		sc.logger.Info(ctx, "🔄 Données manquantes - démarrage collecte automatique",
+			log.String("symbol", symbol))
 
-		c.JSON(http.StatusNotFound, pkg.ErrorResponse{
-			Status:  "error",
-			Message: fmt.Sprintf("No data available for symbol %s. Please collect data first using POST /api/v1/collect/%s", symbol, symbol),
-			Code:    http.StatusNotFound,
-		})
-		return
+		collectStart := time.Now()
+		err := sc.dataCollectionService.CollectCompanyData(symbol)
+		collectDuration := time.Since(collectStart)
+
+		if err != nil {
+			sc.logger.Error(ctx, "❌ Échec de la collecte automatique",
+				log.String("symbol", symbol),
+				log.String("error", err.Error()),
+				log.Float64("collect_duration_ms", float64(collectDuration.Milliseconds())),
+				log.Float64("total_duration_ms", float64(time.Since(startTime).Milliseconds())))
+
+			// Déterminer le code d'erreur approprié
+			errorMessage := err.Error()
+			statusCode := http.StatusInternalServerError
+			if strings.Contains(errorMessage, "invalid symbol") || strings.Contains(errorMessage, "company not found") {
+				statusCode = http.StatusBadRequest
+			}
+
+			c.JSON(statusCode, pkg.ErrorResponse{
+				Status:  "error",
+				Message: fmt.Sprintf("Failed to collect data for %s: %s", symbol, errorMessage),
+				Code:    statusCode,
+			})
+			return
+		}
+
+		sc.logger.Info(ctx, "✅ Collecte automatique réussie - données prêtes pour analyse",
+			log.String("symbol", symbol),
+			log.Float64("collect_duration_ms", float64(collectDuration.Milliseconds())),
+			log.Float64("total_duration_ms", float64(time.Since(startTime).Milliseconds())))
 	}
 
 	sc.logger.Debug(ctx, "✅ Données disponibles, récupération de l'analyse",
@@ -202,13 +225,14 @@ func (sc *ScreeningController) GetValuationAnalysis(c *gin.Context) {
 	})
 }
 
-// @Summary Trigger data collection for a company
-// @Description Manually trigger data collection from Alpha Vantage for a specific company
+// @Summary Trigger data collection for a company (Admin/Testing)
+// @Description Manually trigger data collection from Alpha Vantage. Note: Data collection is automatic in analysis endpoints.
 // @Tags Data Collection
 // @Accept json
 // @Produce json
 // @Param symbol path string true "Company Symbol"
 // @Success 200 {object} pkg.SuccessResponse
+// @Failure 400 {object} pkg.ErrorResponse
 // @Failure 500 {object} pkg.ErrorResponse
 // @Router /api/v1/collect/{symbol} [post]
 func (sc *ScreeningController) CollectCompanyData(c *gin.Context) {

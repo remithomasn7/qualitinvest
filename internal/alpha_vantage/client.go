@@ -19,7 +19,11 @@ type AlphaVantageClient struct {
 }
 
 func NewClient() *AlphaVantageClient {
-	return &AlphaVantageClient{apiKey: os.Getenv("ALPHA_VANTAGE_KEY")}
+	apiKey := os.Getenv("ALPHA_VANTAGE_API_KEY")
+	if apiKey == "" {
+		apiKey = os.Getenv("ALPHA_VANTAGE_KEY") // fallback pour compatibilité
+	}
+	return &AlphaVantageClient{apiKey: apiKey}
 }
 
 func (c *AlphaVantageClient) fetch(params map[string]string) ([]byte, error) {

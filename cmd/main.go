@@ -56,7 +56,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to initialize OpenTelemetry logger: %v", err)
 	}
-	defer otelShutdown()
 
 	// Créer le logger OpenTelemetry
 	appLogger := pkg.NewLogger("qualitinvest-api")
@@ -142,17 +141,28 @@ func main() {
 		Handler: router,
 	}
 
+	// Canal pour les erreurs du serveur
+	serverErrors := make(chan error, 1)
+
 	// Démarrage du serveur dans une goroutine
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("Failed to start server: %v", err)
+			serverErrors <- err
 		}
 	}()
 
-	// Attente des signaux d'arrêt (SIGINT, SIGTERM)
+	// Attente des signaux d'arrêt (SIGINT, SIGTERM) ou d'erreurs du serveur
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
+
+	select {
+	case <-quit:
+		// Signal d'arrêt reçu
+	case err := <-serverErrors:
+		// Erreur du serveur
+		appLogger.Error(ctx, "❌ Server error",
+			otelog.String("error", err.Error()))
+	}
 
 	appLogger.Info(ctx, "🛑 Shutdown signal received, stopping gracefully...")
 
@@ -174,6 +184,10 @@ func main() {
 			otelog.String("error", err.Error()))
 		os.Exit(1)
 	}
+
+	// Arrêt propre du logger OpenTelemetry
+	appLogger.Info(ctx, "📝 Shutting down OpenTelemetry logger...")
+	otelShutdown()
 
 	appLogger.Info(ctx, "✅ Application stopped gracefully")
 }
