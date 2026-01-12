@@ -8,7 +8,7 @@
 
 ## 📋 Overview
 
-qualitinvest is a Go-based REST API that provides comprehensive financial analysis and stock screening capabilities. It integrates with Alpha Vantage for real-time financial data collection and offers intelligent caching, structured logging with OpenTelemetry, and a clean architecture approach.
+qualitinvest is a Go-based REST API that provides comprehensive financial analysis and stock screening capabilities.
 
 ## 🏗️ Architecture
 
@@ -47,6 +47,7 @@ The application follows **Clean Architecture** principles with clear separation 
 - **Automatic Data Fetching** (collects data on-demand if not available)
 - **Comprehensive Stock Analysis** (overview, financials, ratios)
 - **Stock Screening** with customizable criteria
+- **Predefined Screening Templates** for common investment strategies
 - **Structured Logging** with OpenTelemetry
 - **Database Migrations** with Sqitch
 - **Graceful Shutdown** handling
@@ -68,6 +69,30 @@ The application follows **Clean Architecture** principles with clear separation 
 - Earnings data
 - Stock prices and volume
 
+## 📋 Screening Templates
+
+The API provides **4 predefined investment strategy templates** to help users discover companies using proven investment approaches:
+
+### 🎯 Value Investing (Adapted)
+**Strategy**: Find undervalued companies based on low valuation ratios
+**Criteria**: P/E ≤ 40, P/B ≤ 60
+**Use Case**: Classic value investing approach (Graham/Buffett style)
+
+### 🏆 Quality Investing (Adapted)
+**Strategy**: Focus on high-quality companies with strong profitability
+**Criteria**: Profit Margin ≥ 25%
+**Use Case**: Companies with sustainable competitive advantages
+
+### 📊 All Companies
+**Strategy**: View all available companies without filters
+**Criteria**: No restrictions
+**Use Case**: Get an overview of the entire database
+
+### 🏢 Technology Sector
+**Strategy**: Focus specifically on technology companies
+**Criteria**: Sector = "TECHNOLOGY"
+**Use Case**: Technology industry analysis and screening
+
 ## 🗄️ Database Schema
 
 ### PostgreSQL with Sqitch Migrations
@@ -83,11 +108,8 @@ The database schema includes tables for:
 - **dividends**: Dividend history
 - **splits**: Stock split information
 
-### Migrations
-```bash
-cd sqitch
-./sqitch deploy db:pg://user:pass@localhost/qualitinvest
-```
+### Database Initialization
+The database is automatically initialized and migrated when starting the Docker containers.
 
 ## 🔧 Installation & Setup
 
@@ -108,12 +130,10 @@ cd qualitinvest
 
 2. **Database setup:**
 ```bash
-# Create database
-createdb qualitinvest
+# Start PostgreSQL database with Docker Compose
+docker compose up -d
 
-# Run migrations
-cd sqitch
-./sqitch deploy db:pg://localhost/qualitinvest
+# The database will be automatically created and migrations applied
 ```
 
 3. **Environment configuration:**
@@ -208,6 +228,50 @@ curl -X POST http://localhost:8080/api/v1/screening \
   }'
 ```
 
+### Get Screening Templates
+```bash
+curl http://localhost:8080/api/v1/screening/templates
+```
+
+Returns 4 predefined investment strategy templates:
+- **Value Investing (Adapted)**: Low P/E and P/B ratios
+- **Quality Investing (Adapted)**: High profit margins
+- **All Companies**: No filters, show all companies
+- **Technology Sector**: Technology companies only
+
+### Use Predefined Screening Templates
+
+#### Value Investing Template
+```bash
+curl -X POST http://localhost:8080/api/v1/screening \
+  -H "Content-Type: application/json" \
+  -d '{
+    "max_pe_ratio": 40,
+    "max_pb_ratio": 60,
+    "limit": 10
+  }'
+```
+
+#### Quality Investing Template
+```bash
+curl -X POST http://localhost:8080/api/v1/screening \
+  -H "Content-Type: application/json" \
+  -d '{
+    "min_profit_margin": 0.25,
+    "limit": 10
+  }'
+```
+
+#### Technology Sector Template
+```bash
+curl -X POST http://localhost:8080/api/v1/screening \
+  -H "Content-Type: application/json" \
+  -d '{
+    "sectors": ["TECHNOLOGY"],
+    "limit": 10
+  }'
+```
+
 ### Manual Data Collection
 ```bash
 curl -X POST http://localhost:8080/api/v1/collect/MSFT
@@ -274,59 +338,6 @@ cd sqitch
 psql qualitinvest -c "SELECT symbol, name FROM company_overviews LIMIT 5;"
 ```
 
-## 🚀 Deployment
-
-### Production Considerations
-
-1. **Environment Variables**: Use production values
-2. **Database**: Configure connection pooling
-3. **Logging**: Configure OTLP exporter for centralized logging
-4. **API Keys**: Secure storage for Alpha Vantage key
-5. **Rate Limiting**: Consider implementing request limits
-
-### Docker Example
-```dockerfile
-FROM golang:1.23-alpine AS builder
-WORKDIR /app
-COPY . .
-RUN go build -o main cmd/main.go
-
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
-COPY --from=builder /app/main .
-COPY --from=builder /app/env.example .env
-EXPOSE 8080
-CMD ["./main"]
-```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📈 Roadmap
-
-### Short Term
-- [ ] Unit tests for critical services
-- [ ] Complete Swagger documentation
-- [ ] Web interface (React/Vue)
-- [ ] Symbol search API endpoint
-
-### Medium Term
-- [ ] Grafana dashboards for metrics
-- [ ] Intelligent caching strategies
-- [ ] Multi-market support
-- [ ] Alert system for financial thresholds
-
-### Long Term
-- [ ] Machine learning predictions
-- [ ] Portfolio optimization
-- [ ] Real-time data streaming
-- [ ] Mobile application
 
 ## 📄 License
 
