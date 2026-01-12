@@ -109,7 +109,6 @@ func main() {
 	analysis := router.Group("/api/v1/analysis")
 	{
 		analysis.GET("/:symbol", screeningController.GetCompanyAnalysis)
-		analysis.GET("/:symbol/sector", screeningController.GetSectorComparison)
 		analysis.GET("/:symbol/valuation", screeningController.GetValuationAnalysis)
 	}
 

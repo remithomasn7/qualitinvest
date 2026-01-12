@@ -421,19 +421,6 @@ definitions:
       ratios:
         $ref: '#/definitions/models.ValuationRatios'
     type: object
-  models.PeerCompany:
-    properties:
-      market_cap:
-        type: integer
-      name:
-        type: string
-      pb_ratio:
-        type: number
-      pe_ratio:
-        type: number
-      symbol:
-        type: string
-    type: object
   models.ScreeningResult:
     properties:
       beta:
@@ -465,32 +452,6 @@ definitions:
         type: string
       symbol:
         type: string
-    type: object
-  models.SectorAverages:
-    properties:
-      avg_pb_ratio:
-        type: number
-      avg_pe_ratio:
-        type: number
-      avg_profit_margin:
-        type: number
-      avg_revenue_growth:
-        type: number
-      avg_roe:
-        type: number
-      company_count:
-        type: integer
-    type: object
-  models.SectorComparison:
-    properties:
-      company:
-        $ref: '#/definitions/models.Company'
-      peer_companies:
-        items:
-          $ref: '#/definitions/models.PeerCompany'
-        type: array
-      sector_averages:
-        $ref: '#/definitions/models.SectorAverages'
     type: object
   models.ValuationAnalysis:
     properties:
@@ -576,16 +537,6 @@ definitions:
           $ref: '#/definitions/pkg.ScreeningTemplate'
         type: array
     type: object
-  pkg.SectorComparisonResponse:
-    properties:
-      data:
-        allOf:
-        - $ref: '#/definitions/models.SectorComparison'
-        description: Comparaison sectorielle
-      status:
-        description: Statut de la réponse
-        type: string
-    type: object
   pkg.SuccessResponse:
     properties:
       message:
@@ -659,7 +610,8 @@ paths:
     get:
       consumes:
       - application/json
-      description: Get comprehensive fundamental analysis for a specific company
+      description: Get comprehensive fundamental analysis for a specific company.
+        Data collection is automatic if not available.
       parameters:
       - description: Company Symbol
         in: path
@@ -673,8 +625,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/pkg.CompanyAnalysisResponse'
-        "404":
-          description: Not Found
+        "400":
+          description: Bad Request
           schema:
             $ref: '#/definitions/pkg.ErrorResponse'
         "500":
@@ -682,35 +634,6 @@ paths:
           schema:
             $ref: '#/definitions/pkg.ErrorResponse'
       summary: Get detailed company analysis
-      tags:
-      - Analysis
-  /api/v1/analysis/{symbol}/sector:
-    get:
-      consumes:
-      - application/json
-      description: Compare company metrics with sector averages and peers
-      parameters:
-      - description: Company Symbol
-        in: path
-        name: symbol
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/pkg.SectorComparisonResponse'
-        "404":
-          description: Not Found
-          schema:
-            $ref: '#/definitions/pkg.ErrorResponse'
-        "500":
-          description: Internal Server Error
-          schema:
-            $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Get sector comparison for a company
       tags:
       - Analysis
   /api/v1/analysis/{symbol}/valuation:
@@ -746,8 +669,8 @@ paths:
     post:
       consumes:
       - application/json
-      description: Manually trigger data collection from Alpha Vantage for a specific
-        company
+      description: 'Manually trigger data collection from Alpha Vantage. Note: Data
+        collection is automatic in analysis endpoints.'
       parameters:
       - description: Company Symbol
         in: path
@@ -761,11 +684,15 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/pkg.SuccessResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/pkg.ErrorResponse'
         "500":
           description: Internal Server Error
           schema:
             $ref: '#/definitions/pkg.ErrorResponse'
-      summary: Trigger data collection for a company
+      summary: Trigger data collection for a company (Admin/Testing)
       tags:
       - Data Collection
   /api/v1/screening:

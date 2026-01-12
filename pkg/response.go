@@ -78,34 +78,28 @@ type ShareDilutionResponse struct {
 
 // ScreeningResponse représente la réponse pour un screening d'entreprises
 type ScreeningResponse struct {
-	Status string                `json:"status"` // Statut de la réponse
+	Status string                   `json:"status"` // Statut de la réponse
 	Data   []models.ScreeningResult `json:"data"`   // Résultats du screening
-	Count  int                   `json:"count"`  // Nombre de résultats
+	Count  int                      `json:"count"`  // Nombre de résultats
 }
 
 // CompanyAnalysisResponse représente la réponse pour l'analyse d'une entreprise
 type CompanyAnalysisResponse struct {
-	Status string                    `json:"status"` // Statut de la réponse
-	Data   *models.CompanyAnalysis   `json:"data"`   // Analyse complète de l'entreprise
-}
-
-// SectorComparisonResponse représente la réponse pour la comparaison sectorielle
-type SectorComparisonResponse struct {
-	Status string                       `json:"status"` // Statut de la réponse
-	Data   *models.SectorComparison     `json:"data"`   // Comparaison sectorielle
+	Status string                  `json:"status"` // Statut de la réponse
+	Data   *models.CompanyAnalysis `json:"data"`   // Analyse complète de l'entreprise
 }
 
 // ValuationAnalysisResponse représente la réponse pour l'analyse de valorisation
 type ValuationAnalysisResponse struct {
-	Status string                        `json:"status"` // Statut de la réponse
-	Data   *models.ValuationAnalysis     `json:"data"`   // Analyse de valorisation
+	Status string                    `json:"status"` // Statut de la réponse
+	Data   *models.ValuationAnalysis `json:"data"`   // Analyse de valorisation
 }
 
 // ScreeningTemplate représente un modèle de screening prédéfini
 type ScreeningTemplate struct {
-	Name        string                   `json:"name"`        // Nom du template
-	Description string                   `json:"description"` // Description
-	Criteria    interface{}              `json:"criteria"`    // Critères du template
+	Name        string      `json:"name"`        // Nom du template
+	Description string      `json:"description"` // Description
+	Criteria    interface{} `json:"criteria"`    // Critères du template
 }
 
 // ScreeningTemplatesResponse représente la réponse pour les templates de screening

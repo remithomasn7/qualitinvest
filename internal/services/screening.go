@@ -47,6 +47,7 @@ type ScreeningCriteria struct {
 // ScreeningService gère les opérations de screening et d'analyse
 type ScreeningService struct {
 	logger       *pkg.Logger
+	db           *sql.DB
 	overviewRepo repository.CompanyOverviewRepository
 	companyRepo  repository.CompanyRepository
 	incomeRepo   repository.IncomeRepository
@@ -58,6 +59,7 @@ type ScreeningService struct {
 func NewScreeningService(db *sql.DB, logger *pkg.Logger) *ScreeningService {
 	return &ScreeningService{
 		logger:       logger,
+		db:           db,
 		overviewRepo: repository.NewCompanyOverviewRepository(db),
 		companyRepo:  repository.NewCompanyRepository(db),
 		incomeRepo:   repository.NewIncomeRepository(db),
@@ -68,6 +70,11 @@ func NewScreeningService(db *sql.DB, logger *pkg.Logger) *ScreeningService {
 
 // ScreenCompanies applique des critères de filtrage aux entreprises
 func (s *ScreeningService) ScreenCompanies(criteria ScreeningCriteria) ([]models.ScreeningResult, error) {
+	ctx := context.Background()
+
+	s.logger.Info(ctx, "🔍 Début du screening d'entreprises",
+		log.String("criteria", fmt.Sprintf("%+v", criteria)))
+
 	// Pour l'instant, on utilise une requête simple
 	// TODO: Implémenter une vraie logique de screening avec jointures
 
@@ -79,7 +86,7 @@ func (s *ScreeningService) ScreenCompanies(criteria ScreeningCriteria) ([]models
 			co.market_capitalization, co.beta
 		FROM companies c
 		JOIN company_overview co ON c.id = co.company_id
-		WHERE 1=1
+		WHERE c.symbol != ''
 	`
 
 	args := []interface{}{}
@@ -142,9 +149,56 @@ func (s *ScreeningService) ScreenCompanies(criteria ScreeningCriteria) ([]models
 	}
 	query += fmt.Sprintf(" LIMIT %d", limit)
 
-	// Pour l'instant, retourner un résultat vide (implémentation simplifiée)
-	// TODO: Implémenter la vraie logique de screening avec jointures
-	return []models.ScreeningResult{}, nil
+	// Exécuter la requête
+	s.logger.Debug(ctx, "🗃️ Exécution de la requête SQL",
+		log.String("query", query),
+		log.String("args", fmt.Sprintf("%v", args)))
+
+	rows, err := s.db.Query(query, args...)
+	if err != nil {
+		s.logger.Error(ctx, "❌ Erreur lors de l'exécution de la requête",
+			log.String("error", err.Error()))
+		return nil, fmt.Errorf("failed to execute screening query: %w", err)
+	}
+	defer rows.Close()
+
+	var results []models.ScreeningResult
+	for rows.Next() {
+		var result models.ScreeningResult
+		err := rows.Scan(
+			&result.CompanyID,
+			&result.Symbol,
+			&result.Name,
+			&result.Sector,
+			&result.Industry,
+			&result.PERatio,
+			&result.PBRatio,
+			&result.PriceToSales,
+			&result.ProfitMargin,
+			&result.ROE,
+			&result.ROA,
+			&result.MarketCap,
+			&result.Beta,
+		)
+		if err != nil {
+			s.logger.Error(ctx, "❌ Erreur lors du scan d'un résultat",
+				log.String("error", err.Error()))
+			return nil, fmt.Errorf("failed to scan screening result: %w", err)
+		}
+		results = append(results, result)
+	}
+
+	if err := rows.Err(); err != nil {
+		s.logger.Error(ctx, "❌ Erreur lors de l'itération des résultats",
+			log.String("error", err.Error()))
+		return nil, fmt.Errorf("error iterating screening results: %w", err)
+	}
+
+	s.logger.Info(ctx, "✅ Screening terminé",
+		log.Int("results_count", len(results)),
+		log.String("final_query", query))
+
+	return results, nil
 }
 
 // GetCompanyAnalysis retourne une analyse complète d'une entreprise
@@ -212,24 +266,4 @@ func (s *ScreeningService) GetCompanyAnalysis(symbol string) (*models.CompanyAna
 	}
 
 	return analysis, nil
-}
-
-// GetSectorComparison compare une entreprise avec son secteur
-func (s *ScreeningService) GetSectorComparison(symbol string) (*models.SectorComparison, error) {
-	// Récupérer les données de l'entreprise
-	company, err := s.companyRepo.GetBySymbol(symbol)
-	if err != nil {
-		return nil, err
-	}
-	if company == nil {
-		return nil, fmt.Errorf("company not found: %s", symbol)
-	}
-
-	// Calculer les moyennes sectorielles
-	// TODO: Implémenter la logique de calcul des moyennes sectorielles
-
-	return &models.SectorComparison{
-		Company: *company,
-		// SectorAverages: sectorAverages,
-	}, nil
 }

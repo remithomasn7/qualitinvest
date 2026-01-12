@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/api/v1/analysis/{symbol}": {
             "get": {
-                "description": "Get comprehensive fundamental analysis for a specific company",
+                "description": "Get comprehensive fundamental analysis for a specific company. Data collection is automatic if not available.",
                 "consumes": [
                     "application/json"
                 ],
@@ -44,52 +44,8 @@ const docTemplate = `{
                             "$ref": "#/definitions/pkg.CompanyAnalysisResponse"
                         }
                     },
-                    "404": {
-                        "description": "Not Found",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.ErrorResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/analysis/{symbol}/sector": {
-            "get": {
-                "description": "Compare company metrics with sector averages and peers",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Analysis"
-                ],
-                "summary": "Get sector comparison for a company",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Company Symbol",
-                        "name": "symbol",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/pkg.SectorComparisonResponse"
-                        }
-                    },
-                    "404": {
-                        "description": "Not Found",
+                    "400": {
+                        "description": "Bad Request",
                         "schema": {
                             "$ref": "#/definitions/pkg.ErrorResponse"
                         }
@@ -149,7 +105,7 @@ const docTemplate = `{
         },
         "/api/v1/collect/{symbol}": {
             "post": {
-                "description": "Manually trigger data collection from Alpha Vantage for a specific company",
+                "description": "Manually trigger data collection from Alpha Vantage. Note: Data collection is automatic in analysis endpoints.",
                 "consumes": [
                     "application/json"
                 ],
@@ -159,7 +115,7 @@ const docTemplate = `{
                 "tags": [
                     "Data Collection"
                 ],
-                "summary": "Trigger data collection for a company",
+                "summary": "Trigger data collection for a company (Admin/Testing)",
                 "parameters": [
                     {
                         "type": "string",
@@ -174,6 +130,12 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/pkg.SuccessResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/pkg.ErrorResponse"
                         }
                     },
                     "500": {
@@ -879,26 +841,6 @@ const docTemplate = `{
                 }
             }
         },
-        "models.PeerCompany": {
-            "type": "object",
-            "properties": {
-                "market_cap": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "pb_ratio": {
-                    "type": "number"
-                },
-                "pe_ratio": {
-                    "type": "number"
-                },
-                "symbol": {
-                    "type": "string"
-                }
-            }
-        },
         "models.ScreeningResult": {
             "type": "object",
             "properties": {
@@ -944,46 +886,6 @@ const docTemplate = `{
                 },
                 "symbol": {
                     "type": "string"
-                }
-            }
-        },
-        "models.SectorAverages": {
-            "type": "object",
-            "properties": {
-                "avg_pb_ratio": {
-                    "type": "number"
-                },
-                "avg_pe_ratio": {
-                    "type": "number"
-                },
-                "avg_profit_margin": {
-                    "type": "number"
-                },
-                "avg_revenue_growth": {
-                    "type": "number"
-                },
-                "avg_roe": {
-                    "type": "number"
-                },
-                "company_count": {
-                    "type": "integer"
-                }
-            }
-        },
-        "models.SectorComparison": {
-            "type": "object",
-            "properties": {
-                "company": {
-                    "$ref": "#/definitions/models.Company"
-                },
-                "peer_companies": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/models.PeerCompany"
-                    }
-                },
-                "sector_averages": {
-                    "$ref": "#/definitions/models.SectorAverages"
                 }
             }
         },
@@ -1110,23 +1012,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/pkg.ScreeningTemplate"
                     }
-                }
-            }
-        },
-        "pkg.SectorComparisonResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "description": "Comparaison sectorielle",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/models.SectorComparison"
-                        }
-                    ]
-                },
-                "status": {
-                    "description": "Statut de la réponse",
-                    "type": "string"
                 }
             }
         },

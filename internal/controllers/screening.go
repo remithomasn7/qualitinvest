@@ -176,35 +176,6 @@ func (sc *ScreeningController) GetCompanyAnalysis(c *gin.Context) {
 	})
 }
 
-// @Summary Get sector comparison for a company
-// @Description Compare company metrics with sector averages and peers
-// @Tags Analysis
-// @Accept json
-// @Produce json
-// @Param symbol path string true "Company Symbol"
-// @Success 200 {object} pkg.SectorComparisonResponse
-// @Failure 404 {object} pkg.ErrorResponse
-// @Failure 500 {object} pkg.ErrorResponse
-// @Router /api/v1/analysis/{symbol}/sector [get]
-func (sc *ScreeningController) GetSectorComparison(c *gin.Context) {
-	symbol := c.Param("symbol")
-
-	comparison, err := sc.screeningService.GetSectorComparison(symbol)
-	if err != nil {
-		c.JSON(http.StatusNotFound, pkg.ErrorResponse{
-			Status:  "error",
-			Message: "Sector comparison not available: " + err.Error(),
-			Code:    http.StatusNotFound,
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, pkg.SectorComparisonResponse{
-		Status: "success",
-		Data:   comparison,
-	})
-}
-
 // @Summary Get valuation analysis for a company
 // @Description Get detailed valuation analysis with fair value estimates
 // @Tags Analysis
@@ -274,35 +245,35 @@ func (sc *ScreeningController) CollectCompanyData(c *gin.Context) {
 func (sc *ScreeningController) GetScreeningTemplates(c *gin.Context) {
 	templates := []pkg.ScreeningTemplate{
 		{
-			Name:        "Value Investing",
-			Description: "Classic value investing criteria",
+			Name:        "Value Investing (Adapted)",
+			Description: "Classic value investing - adapted for AAPL/MSFT data",
 			Criteria: services.ScreeningCriteria{
-				MaxPERatio:      floatPtr(15),
-				MaxPBRatio:      floatPtr(1.5),
-				MinROE:          floatPtr(0.10),
-				MaxDebtToEquity: floatPtr(1.0),
+				MaxPERatio: floatPtr(40), // AAPL=37.04, MSFT=33.66
+				MaxPBRatio: floatPtr(60), // AAPL=54.41
+				Limit:      100,
+			},
+		},
+		{
+			Name:        "Quality Investing (Adapted)",
+			Description: "High quality companies - adapted for current data",
+			Criteria: services.ScreeningCriteria{
+				MinProfitMargin: floatPtr(0.25), // MSFT=0.357 (35.7%)
 				Limit:           100,
 			},
 		},
 		{
-			Name:        "Growth Investing",
-			Description: "High growth companies",
+			Name:        "All Companies",
+			Description: "Show all companies in database",
 			Criteria: services.ScreeningCriteria{
-				MinRevenueGrowth: floatPtr(0.15),
-				MinEPSGrowth:     floatPtr(0.15),
-				MinROE:           floatPtr(0.15),
-				Limit:            100,
+				Limit: 100,
 			},
 		},
 		{
-			Name:        "Quality Investing",
-			Description: "High quality, stable companies",
+			Name:        "Technology Sector",
+			Description: "All technology companies",
 			Criteria: services.ScreeningCriteria{
-				MinProfitMargin: floatPtr(0.10),
-				MinROE:          floatPtr(0.15),
-				MaxDebtToEquity: floatPtr(0.5),
-				MinCurrentRatio: floatPtr(1.5),
-				Limit:           100,
+				Sectors: []string{"TECHNOLOGY"},
+				Limit:   100,
 			},
 		},
 	}
