@@ -18,6 +18,7 @@ import (
 
 	_ "github.com/remithomasn7/qualitinvest/docs" // Import indirect pour Swagger
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files" // swagger embed files
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -72,7 +73,23 @@ func main() {
 		gin.DefaultErrorWriter = &otelWriter{ctx: ctx, logger: appLogger}
 	}
 
-	router := gin.Default()
+	// Créer un router Gin sans les middlewares par défaut (Logger, Recovery)
+	// pour éviter les conflits avec CORS
+	router := gin.New()
+
+	// Configuration CORS pour permettre les appels depuis le frontend
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"}, // Permettre toutes les origines en développement
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"},
+		AllowHeaders:     []string{"*"}, // Permettre tous les headers
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: false,
+		MaxAge:           12 * 60 * 60,
+	}))
+
+	// Ajouter les middlewares Logger et Recovery après CORS
+	router.Use(gin.Logger())
+	router.Use(gin.Recovery())
 
 	router.SetTrustedProxies(nil)
 
