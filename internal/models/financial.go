@@ -319,6 +319,7 @@ type CashFlowStatementsAnnualReport struct {
 	ChangeInExchangeRate                                      AVInt  `json:"changeInExchangeRate"`
 	NetIncome                                                 AVInt  `json:"netIncome"`
 }
+
 type CashFlowStatementsQuarterlyReport struct {
 	FiscalDateEnding                                          string `json:"fiscalDateEnding"`
 	ReportedCurrency                                          string `json:"reportedCurrency"`
@@ -349,4 +350,22 @@ type CashFlowStatementsQuarterlyReport struct {
 	ChangeInCashAndCashEquivalents                            AVInt  `json:"changeInCashAndCashEquivalents"`
 	ChangeInExchangeRate                                      AVInt  `json:"changeInExchangeRate"`
 	NetIncome                                                 AVInt  `json:"netIncome"`
+}
+
+// SymbolSearchResult représente un résultat de recherche de symbole Alpha Vantage
+type SymbolSearchResult struct {
+	Symbol      string  `json:"symbol"`      // 1. symbol
+	Name        string  `json:"name"`        // 2. name
+	Type        string  `json:"type"`        // 3. type
+	Region      string  `json:"region"`      // 4. region
+	MarketOpen  string  `json:"marketOpen"`  // 5. marketOpen
+	MarketClose string  `json:"marketClose"` // 6. marketClose
+	Timezone    string  `json:"timezone"`    // 7. timezone
+	Currency    string  `json:"currency"`    // 8. currency
+	MatchScore  float64 `json:"matchScore"`  // 9. matchScore
+}
+
+// SymbolSearchResponse représente la réponse de recherche de symbole Alpha Vantage
+type SymbolSearchResponse struct {
+	BestMatches []SymbolSearchResult `json:"bestMatches"`
 }

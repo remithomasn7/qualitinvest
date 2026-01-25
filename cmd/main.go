@@ -106,13 +106,14 @@ func main() {
 	// Initialize services
 	dataCollectionService := services.NewDataCollectionService(db, apiClient, appLogger)
 	screeningService := services.NewScreeningService(db, appLogger)
+	searchService := services.NewSearchService(db, apiClient, dataCollectionService, appLogger)
 	scheduler := services.NewDataScheduler(dataCollectionService)
 
 	// Start the data collection scheduler
 	scheduler.Start()
 
 	// Initialize controllers
-	screeningController := controllers.NewScreeningController(screeningService, dataCollectionService, appLogger)
+	screeningController := controllers.NewScreeningController(screeningService, dataCollectionService, searchService, appLogger)
 
 	// ============================
 	// NOUVEAUX ENDPOINTS DE SCREENING ET ANALYSE
@@ -128,6 +129,9 @@ func main() {
 		analysis.GET("/:symbol", screeningController.GetCompanyAnalysis)
 		analysis.GET("/:symbol/valuation", screeningController.GetValuationAnalysis)
 	}
+
+	// Search endpoint
+	router.GET("/api/v1/search", screeningController.SearchCompanies)
 
 	// Data collection management
 	router.POST("/api/v1/collect/:symbol", screeningController.CollectCompanyData)

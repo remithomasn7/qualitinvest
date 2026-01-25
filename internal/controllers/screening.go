@@ -18,14 +18,16 @@ type ScreeningController struct {
 	logger                *pkg.Logger
 	screeningService      *services.ScreeningService
 	dataCollectionService *services.DataCollectionService
+	searchService         *services.SearchService
 }
 
 // NewScreeningController crée un nouveau contrôleur de screening
-func NewScreeningController(screeningSvc *services.ScreeningService, dataSvc *services.DataCollectionService, logger *pkg.Logger) *ScreeningController {
+func NewScreeningController(screeningSvc *services.ScreeningService, dataSvc *services.DataCollectionService, searchSvc *services.SearchService, logger *pkg.Logger) *ScreeningController {
 	return &ScreeningController{
 		logger:                logger,
 		screeningService:      screeningSvc,
 		dataCollectionService: dataSvc,
+		searchService:         searchSvc,
 	}
 }
 
@@ -281,6 +283,64 @@ func (sc *ScreeningController) GetScreeningTemplates(c *gin.Context) {
 	c.JSON(http.StatusOK, pkg.ScreeningTemplatesResponse{
 		Status:    "success",
 		Templates: templates,
+	})
+}
+
+// @Summary Search companies by keywords
+// @Description Search companies using Alpha Vantage SYMBOL_SEARCH. Automatically collects data for new companies.
+// @Tags Search
+// @Accept json
+// @Produce json
+// @Param keywords query string true "Search keywords"
+// @Success 200 {object} pkg.SearchResponse
+// @Failure 400 {object} pkg.ErrorResponse
+// @Failure 500 {object} pkg.ErrorResponse
+// @Router /api/v1/search [get]
+func (sc *ScreeningController) SearchCompanies(c *gin.Context) {
+	ctx := context.Background()
+	keywords := c.Query("keywords")
+
+	if keywords == "" {
+		c.JSON(http.StatusBadRequest, pkg.ErrorResponse{
+			Status:  "error",
+			Message: "keywords parameter is required",
+			Code:    http.StatusBadRequest,
+		})
+		return
+	}
+
+	sc.logger.Info(ctx, "🔍 Requête de recherche reçue",
+		log.String("keywords", keywords),
+		log.String("endpoint", "/api/v1/search"))
+
+	results, err := sc.searchService.SearchCompanies(ctx, keywords)
+	if err != nil {
+		sc.logger.Error(ctx, "❌ Erreur lors de la recherche",
+			log.String("keywords", keywords),
+			log.String("error", err.Error()))
+
+		c.JSON(http.StatusInternalServerError, pkg.ErrorResponse{
+			Status:  "error",
+			Message: "Search failed: " + err.Error(),
+			Code:    http.StatusInternalServerError,
+		})
+		return
+	}
+
+	// Convertir les résultats en interface{} pour la réponse
+	data := make([]interface{}, len(results))
+	for i, r := range results {
+		data[i] = r
+	}
+
+	sc.logger.Info(ctx, "✅ Recherche terminée avec succès",
+		log.String("keywords", keywords),
+		log.Int("count", len(results)))
+
+	c.JSON(http.StatusOK, pkg.SearchResponse{
+		Status: "success",
+		Data:   data,
+		Count:  len(results),
 	})
 }
 

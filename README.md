@@ -187,6 +187,11 @@ OTEL_LOGS_EXPORTER=console
 
 ## 📡 API Endpoints
 
+### Stock Search
+```
+GET /api/v1/search?keywords={query}  # Search companies by keywords (live search, auto-collects if needed)
+```
+
 ### Stock Analysis
 ```
 GET /api/v1/analysis/{symbol}      # Complete company analysis (auto-collects if needed)
@@ -210,6 +215,19 @@ GET /swagger/*                     # Swagger UI
 ```
 
 ## 🔍 Usage Examples
+
+### Search Companies (live search with auto-collection)
+```bash
+curl "http://localhost:8080/api/v1/search?keywords=apple"
+```
+
+Returns a list of matching companies with minimal information:
+- Symbol, name, type, region, currency
+- Match score (0-1, converted to 0-20 in frontend)
+- Country, sector, market cap (if available in database)
+- `inDatabase` flag indicating if company data is already collected
+
+**Note**: If a company is not found in the database, data collection is automatically triggered in the background.
 
 ### Get Company Analysis (with automatic data collection)
 ```bash

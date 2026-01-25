@@ -113,3 +113,10 @@ type SuccessResponse struct {
 	Status  string `json:"status"`  // Statut de la réponse
 	Message string `json:"message"` // Message de succès
 }
+
+// SearchResponse représente la réponse pour une recherche d'entreprises
+type SearchResponse struct {
+	Status string                   `json:"status"` // Statut de la réponse
+	Data   []interface{}            `json:"data"`   // Résultats de recherche (utilise interface{} pour flexibilité)
+	Count  int                      `json:"count"`  // Nombre de résultats
+}

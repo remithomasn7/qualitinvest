@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 
@@ -222,4 +223,75 @@ func (c *AlphaVantageClient) CashFlowStatements(symbol string) (*models.CashFlow
 		return nil, err
 	}
 	return cashFlowStatements, nil
+}
+
+// SymbolSearch recherche des symboles d'entreprises via Alpha Vantage SYMBOL_SEARCH
+func (c *AlphaVantageClient) SymbolSearch(keywords string) (*models.SymbolSearchResponse, error) {
+	searchResponse := &models.SymbolSearchResponse{}
+
+	params := map[string]string{
+		"function": "SYMBOL_SEARCH",
+		"keywords": keywords,
+	}
+
+	body, err := c.fetch(params)
+	if err != nil {
+		return nil, err
+	}
+
+	// Alpha Vantage retourne soit "bestMatches" soit "Error Message" ou "Note"
+	var rawResponse map[string]interface{}
+	if err = json.Unmarshal(body, &rawResponse); err != nil {
+		return nil, err
+	}
+
+	// Vérifier si c'est une erreur
+	if note, ok := rawResponse["Note"].(string); ok {
+		return nil, fmt.Errorf("API note: %s", note)
+	}
+	if errorMsg, ok := rawResponse["Error Message"].(string); ok {
+		return nil, fmt.Errorf("API error: %s", errorMsg)
+	}
+
+	// Parser les bestMatches
+	if bestMatches, ok := rawResponse["bestMatches"].([]interface{}); ok {
+		for _, match := range bestMatches {
+			if matchMap, ok := match.(map[string]interface{}); ok {
+				result := models.SymbolSearchResult{}
+				if symbol, ok := matchMap["1. symbol"].(string); ok {
+					result.Symbol = symbol
+				}
+				if name, ok := matchMap["2. name"].(string); ok {
+					result.Name = name
+				}
+				if matchScore, ok := matchMap["3. type"].(string); ok {
+					result.Type = matchScore
+				}
+				if region, ok := matchMap["4. region"].(string); ok {
+					result.Region = region
+				}
+				if marketOpen, ok := matchMap["5. marketOpen"].(string); ok {
+					result.MarketOpen = marketOpen
+				}
+				if marketClose, ok := matchMap["6. marketClose"].(string); ok {
+					result.MarketClose = marketClose
+				}
+				if timezone, ok := matchMap["7. timezone"].(string); ok {
+					result.Timezone = timezone
+				}
+				if currency, ok := matchMap["8. currency"].(string); ok {
+					result.Currency = currency
+				}
+				if matchScore, ok := matchMap["9. matchScore"].(string); ok {
+					// Convertir le score en float64
+					if score, err := strconv.ParseFloat(matchScore, 64); err == nil {
+						result.MatchScore = score
+					}
+				}
+				searchResponse.BestMatches = append(searchResponse.BestMatches, result)
+			}
+		}
+	}
+
+	return searchResponse, nil
 }
